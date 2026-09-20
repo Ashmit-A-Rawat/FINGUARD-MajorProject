@@ -27,8 +27,8 @@ data/reconciliation/*
 *.bin
 knowledge_base/vector_store/*
 !knowledge_base/vector_store/__init__.py
-llm/models/*
-!llm/models/__init__.py
+# model weight directories (Python files in llm/models/ stay tracked)
+llm/models/*/
 .DS_Store
 .idea/
 .vscode/

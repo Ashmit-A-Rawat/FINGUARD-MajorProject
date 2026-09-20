@@ -1,6 +1,6 @@
 PY := PYTHONPATH=. .venv/bin/python
 
-.PHONY: install test lint typecheck run data pipeline kyc-benchmark anomaly-benchmark reconciliation-eval rag-benchmark hardware
+.PHONY: install test lint typecheck run data pipeline kyc-benchmark anomaly-benchmark reconciliation-eval rag-benchmark hardware llm-check
 install:
 	$(PY) -m pip install -e ".[dev]"
 test:
@@ -26,3 +26,5 @@ rag-benchmark:
 	$(PY) experiments/rag/run_retrieval_benchmark.py
 hardware:
 	$(PY) scripts/assess_hardware.py
+llm-check:
+	$(PY) experiments/llm/run_structured_output_check.py --provider qwen --model llm/models/qwen2.5-1.5b-instruct

@@ -6,6 +6,7 @@ during generation.
 """
 
 import time
+from pathlib import Path
 from typing import Any
 
 from llm.inference.base import (
@@ -28,6 +29,10 @@ def resolve_device(requested: str) -> str:
 
 
 def is_cached_locally(model_id: str) -> bool:
+    """True if ``model_id`` is a local directory with weights, or is in the Hugging Face cache."""
+    directory = Path(model_id)
+    if directory.is_dir():
+        return (directory / "config.json").exists() and any(directory.glob("*.safetensors"))
     from huggingface_hub import snapshot_download
 
     try:
@@ -67,7 +72,7 @@ class LocalHFProvider(LLMProvider):
         self.device = resolve_device(self._device_request)
         dtype = torch.float32 if self.device == "cpu" else torch.float16
         self._tokenizer = AutoTokenizer.from_pretrained(self.model)
-        net: Any = AutoModelForCausalLM.from_pretrained(self.model, torch_dtype=dtype)
+        net: Any = AutoModelForCausalLM.from_pretrained(self.model, dtype=dtype)
         self._net = net.to(self.device).eval()
 
     def generate(self, request: GenerationRequest) -> GenerationResult:

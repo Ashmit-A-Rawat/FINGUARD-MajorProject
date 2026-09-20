@@ -37,7 +37,7 @@ cp .env.example .env
 | Reconciliation eval | `make reconciliation-eval` |
 | Anomaly benchmark | `make anomaly-benchmark` (report in `evaluation/reports/anomaly/`); progress: `scripts/run_status.sh <log>` |
 | Frontend | *Phase 11* |
-| Local LLM | `make hardware`, then set `LLM_PROVIDER` (default `mock`) |
+| Local LLM | `make hardware`; fetch weights deliberately (`scripts/download_model.py` or `scripts/fetch_weights.sh`); set `LLM_PROVIDER=qwen`, `LLM_MODEL=<dir or id>`; check with `make llm-check` |
 | Evaluation | *Phase 13* |
 
 ## Research questions

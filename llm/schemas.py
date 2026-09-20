@@ -7,6 +7,16 @@ from pydantic import BaseModel, Field, field_validator
 from backend.app.schemas.domain import Decision
 
 
+def normalize_citation(reference: str) -> str:
+    """Canonical id of a cited item: strip brackets and the ``E:`` / ``K:`` token prefix.
+
+    The prompt shows evidence as ``[E:TXN-1]`` and models (correctly) often cite ``E:TXN-1``; both
+    forms mean evidence id ``TXN-1``. Validators must compare normalised ids.
+    """
+    ref = reference.strip().strip("[]").strip()
+    return ref[2:] if ref[:2] in ("E:", "K:", "e:", "k:") else ref
+
+
 class FindingKind(StrEnum):
     FACT = "fact"  # taken directly from the evidence
     INFERENCE = "inference"  # a conclusion drawn from facts

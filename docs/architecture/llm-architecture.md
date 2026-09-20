@@ -110,3 +110,15 @@ tokens; payloads are length-bounded. The prompt version and nonce are returned f
 - The mock proves plumbing, not model quality. Behaviour of a real small model is measured separately (see experiments).
 - On a single-threaded CPU a 1.5B model is slow; MPS is used when available.
 - Model calls run in-process; because of the OpenMP clash (ADR 0002) a separate inference process is the safer production shape.
+
+
+## Measured behaviour of the default local model (Qwen2.5-1.5B-Instruct, see EXP-LLM-01)
+Reliable JSON (28/28 first attempt) but a weak, injectable judge: 6/8 behavioural anomalies marked CLEAR, and an injected memo flipped 3 of 4
+paired decisions to CLEAR despite fencing and instructions. **Therefore the LLM is advisory and untrusted in this architecture:** Phase 10 must
+(1) verify every cited claim against the evidence, (2) apply deterministic policy checks so model output can never lower risk below engine findings,
+and (3) route anything unsupported to REVIEW. Citation ids are normalised (`normalize_citation`) because the model cites `E:<id>` as shown in the prompt.
+
+## Local model files
+Weights are never committed (`llm/models/*/` is ignored). `scripts/fetch_weights.sh <url> <file>` is a resumable download for flaky connections
+(reconnects on stalls); `scripts/download_model.py <id> --yes` uses the Hugging Face client. Set `LLM_PROVIDER=qwen` and
+`LLM_MODEL=llm/models/qwen2.5-1.5b-instruct` (a local directory works, which is what an air-gapped on-premise install needs).

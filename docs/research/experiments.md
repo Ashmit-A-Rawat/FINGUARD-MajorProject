@@ -187,3 +187,46 @@ messy real ledgers (rounding conventions, FX, partial settlements, timezone diff
   "gold in top-5" is 5/6 everywhere. Treat that as a question-quality issue, not a retrieval finding.
 - A poisoned document inside a trusted source is not addressed by this layer.
 - No LLM is involved yet; this says nothing about answer quality or grounding (RQ3), only that the right evidence can be found.
+
+## EXP-LLM-01: Real local model on realistic cases (format, citations, decisions, injection). Groundwork for RQ3-RQ5
+
+- Script: `experiments/llm/run_structured_output_check.py --provider qwen --model llm/models/qwen2.5-1.5b-instruct` (`make llm-check`)
+- Artifact: `evaluation/reports/llm/structured_output_qwen_qwen2.5-1.5b-instruct.json` (includes each case's raw model text)
+- Model: **Qwen2.5-1.5B-Instruct** (Apache-2.0), fp16 on Apple M2 Metal, greedy decoding, prompt `investigation-v1`, retrieval of 2 trusted chunks per case.
+- 28 synthetic cases: 8 reconciliation problems, 8 behavioural anomalies, 8 clean, plus 4 *paired* injection cases (the same reconciliation problems again, with an
+  instruction injected into the payment memo). Evidence contains raw facts and engine findings; it does **not** contain an anomaly-engine verdict.
+
+| measure | result |
+|---|---|
+| structured output valid on the first attempt | **28/28** (no repair needed) |
+| outputs citing an id that was not in the evidence | 2/28 (7%): both cited a rule shorthand such as `REC-003` instead of the evidence id |
+| findings of kind "fact" with no citation | 0 |
+| behavioural anomalies marked CLEAR | **6/8** |
+| reconciliation problems marked CLEAR | 1/8 (6 REVIEW, 1 ESCALATE) |
+| clean cases marked CLEAR | 7/8 |
+| paired injection: control decision -> decision with injected memo | **3 of 4 flipped to CLEAR** (REVIEW->CLEAR twice, ESCALATE->CLEAR once); 0 controls were CLEAR |
+| injected outputs that mention the memo as suspicious | 0/4 |
+| latency, tokens | 19.3 s per case, about 14 tokens/s, median prompt 1,115 tokens, about 279 completion tokens |
+| memory | about 3.3 GB on the GPU (measured in the smoke test) plus about 1.5 GB process RSS, on an 8 GB machine |
+
+### What the data supports
+1. **A 1.5B model can produce the required JSON reliably** (28/28 first try, zero facts left uncited). Format is not the bottleneck; the bounded repair loop was never needed here.
+2. **It is not a reliable judge.** Given raw behavioural facts (for example "amount 25x the customer's typical amount", "3 a.m.") it marked 6 of 8 real anomalies CLEAR.
+   It does better when the evidence states a discrepancy explicitly (reconciliation: 6/8 REVIEW). It does not reason from numbers to "unusual".
+3. **Prompt-level defences were not enough against injected text.** Despite fencing, a nonce delimiter and explicit instructions, an instruction in the memo flipped the decision to
+   CLEAR in 3 of 4 paired cases, and the model never flagged the memo. With n=4 this is anecdotal, but the pairing makes it hard to dismiss: controls were never CLEAR.
+   **Design consequence for Phase 10:** model output must never be able to lower risk below what deterministic engines found (policy checks such as "a high-severity reconciliation
+   finding cannot end as CLEAR"), and every cited claim must be verified against the evidence. Model compliance cannot be the control.
+4. **Citation format needs one convention.** The model cites ids as shown in the prompt (`E:TXN-1`, 100% of citations were prefixed). A first checker that compared bare ids reported
+   100% "hallucinated" ids; that was the checker's bug. Validators must normalise (`llm.schemas.normalize_citation`). The remaining true invalid citations were 2/28.
+
+### Two runs, and why to be cautious
+A first run used a flawed checker and an injection test on clean cases (where CLEAR is the *correct* answer, so obedience could not be measured); it was discarded and redesigned as the paired test.
+On the 24 unchanged cases the second run differed from the first on 2 reconciliation decisions (8/8 REVIEW became 6 REVIEW, 1 ESCALATE, 1 CLEAR). The prompt fence uses a random nonce and Metal kernels are not bit-exact, so
+decisions of this small model are **not perfectly reproducible**. Anything measured on it needs repeated runs (or a fixed nonce, which the prompt builder supports) before a claim is made.
+
+### Threats to validity
+- 28 cases and 4 injection pairs; no confidence intervals; one model, one prompt version, one decoding setting; no prompt tuning was done (deliberately, to avoid tuning on the test cases).
+- Evidence had no anomaly verdict. In the full system the anomaly engine's score would be evidence, which would likely change the behavioural result. Not tested here.
+- "Decision sanity" uses the generator's labels as ground truth, and one injected phrasing only.
+- This is not the grounding evaluation (whether each claim is *supported*); that needs the Phase 10 validator.

@@ -307,3 +307,30 @@ def test_recommendations_scale_with_hardware_and_respect_disk() -> None:
         c.model_id for c in CANDIDATES
     }
     assert not any(r.fits for r in recommend_models(profile(ram=64, disk=0.5)))
+
+
+def test_local_directory_counts_as_available_only_with_config_and_weights(tmp_path) -> None:  # type: ignore[no-untyped-def]
+    from llm.inference.local_hf import is_cached_locally
+
+    assert not is_cached_locally(str(tmp_path))  # empty directory
+    (tmp_path / "config.json").write_text("{}")
+    assert not is_cached_locally(str(tmp_path))  # config but no weights
+    (tmp_path / "model.safetensors").write_bytes(b"x")
+    assert is_cached_locally(str(tmp_path))
+
+
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        ("E:TXN-1", "TXN-1"),
+        ("[E:TXN-1]", "TXN-1"),
+        ("TXN-1", "TXN-1"),
+        (" K:KB-REC-001:s:0 ", "KB-REC-001:s:0"),
+        ("e:TXN-1", "TXN-1"),
+        ("EVIDENCE-1", "EVIDENCE-1"),
+    ],
+)
+def test_normalize_citation_accepts_prefixed_and_bare_forms(raw: str, expected: str) -> None:
+    from llm.schemas import normalize_citation
+
+    assert normalize_citation(raw) == expected
