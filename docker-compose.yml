@@ -1,0 +1,14 @@
+# Phase 1: database only. Backend/frontend services are added in later phases.
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-finguard}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-finguard}
+      POSTGRES_DB: ${POSTGRES_DB:-finguard}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:
