@@ -1,0 +1,905 @@
+{
+  "notice": "SYNTHETIC knowledge base and hand-written questions (single author).",
+  "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+  "versions": {
+    "chromadb": "1.5.9",
+    "sentence-transformers": "6.1.0"
+  },
+  "n_answerable": 43,
+  "n_unanswerable": 7,
+  "ablation": {
+    "small_40w": {
+      "n_chunks": 101,
+      "bm25": {
+        "all": {
+          "n": 43,
+          "hit@1": 0.7906976744186046,
+          "hit@1_ci95": [
+            0.6744186046511628,
+            0.9069767441860465
+          ],
+          "hit@3": 0.9534883720930233,
+          "hit@5": 0.9534883720930233,
+          "hit@5_ci95": [
+            0.8837209302325582,
+            1.0
+          ],
+          "doc_hit@5": 1.0,
+          "mrr": 0.8705426356589148,
+          "mrr_ci95": [
+            0.7899224806201551,
+            0.9418604651162791
+          ],
+          "ndcg@5": 0.8658222853892019
+        },
+        "direct": {
+          "n": 16,
+          "hit@1": 0.9375,
+          "hit@3": 1.0,
+          "hit@5": 1.0,
+          "doc_hit@5": 1.0,
+          "mrr": 0.96875,
+          "ndcg@5": 0.9719156589199778
+        },
+        "paraphrase": {
+          "n": 12,
+          "hit@1": 0.5833333333333334,
+          "hit@3": 0.9166666666666666,
+          "hit@5": 0.9166666666666666,
+          "doc_hit@5": 1.0,
+          "mrr": 0.736111111111111,
+          "ndcg@5": 0.7702611805207606
+        },
+        "scenario": {
+          "n": 10,
+          "hit@1": 0.7,
+          "hit@3": 0.9,
+          "hit@5": 0.9,
+          "doc_hit@5": 1.0,
+          "mrr": 0.8099999999999999,
+          "ndcg@5": 0.7436573562766908
+        },
+        "rule_id": {
+          "n": 5,
+          "hit@1": 1.0,
+          "hit@3": 1.0,
+          "hit@5": 1.0,
+          "doc_hit@5": 1.0,
+          "mrr": 1.0,
+          "ndcg@5": 1.0
+        }
+      },
+      "dense": {
+        "all": {
+          "n": 43,
+          "hit@1": 0.7906976744186046,
+          "hit@1_ci95": [
+            0.6744186046511628,
+            0.9069767441860465
+          ],
+          "hit@3": 0.9069767441860465,
+          "hit@5": 0.9534883720930233,
+          "hit@5_ci95": [
+            0.8837209302325582,
+            1.0
+          ],
+          "doc_hit@5": 0.9767441860465116,
+          "mrr": 0.8560354374307865,
+          "mrr_ci95": [
+            0.7677048726467331,
+            0.937984496124031
+          ],
+          "ndcg@5": 0.8430929856828725
+        },
+        "direct": {
+          "n": 16,
+          "hit@1": 1.0,
+          "hit@3": 1.0,
+          "hit@5": 1.0,
+          "doc_hit@5": 1.0,
+          "mrr": 1.0,
+          "ndcg@5": 1.0
+        },
+        "paraphrase": {
+          "n": 12,
+          "hit@1": 0.75,
+          "hit@3": 0.8333333333333334,
+          "hit@5": 0.9166666666666666,
+          "doc_hit@5": 0.9166666666666666,
+          "mrr": 0.8125000000000001,
+          "ndcg@5": 0.7630809119670259
+        },
+        "scenario": {
+          "n": 10,
+          "hit@1": 0.7,
+          "hit@3": 1.0,
+          "hit@5": 1.0,
+          "doc_hit@5": 1.0,
+          "mrr": 0.8166666666666667,
+          "ndcg@5": 0.8034421129114356
+        },
+        "rule_id": {
+          "n": 5,
+          "hit@1": 0.4,
+          "hit@3": 0.6,
+          "hit@5": 0.8,
+          "doc_hit@5": 1.0,
+          "mrr": 0.5785714285714285,
+          "ndcg@5": 0.6123212623289701
+        }
+      },
+      "hybrid": {
+        "all": {
+          "n": 43,
+          "hit@1": 0.8837209302325582,
+          "hit@1_ci95": [
+            0.7906976744186046,
+            0.9767441860465116
+          ],
+          "hit@3": 0.9767441860465116,
+          "hit@5": 0.9767441860465116,
+          "hit@5_ci95": [
+            0.9302325581395349,
+            1.0
+          ],
+          "doc_hit@5": 1.0,
+          "mrr": 0.9302325581395349,
+          "mrr_ci95": [
+            0.868217054263566,
+            0.9844961240310076
+          ],
+          "ndcg@5": 0.9225118260159348
+        },
+        "direct": {
+          "n": 16,
+          "hit@1": 1.0,
+          "hit@3": 1.0,
+          "hit@5": 1.0,
+          "doc_hit@5": 1.0,
+          "mrr": 1.0,
+          "ndcg@5": 0.9949825493217617
+        },
+        "paraphrase": {
+          "n": 12,
+          "hit@1": 0.8333333333333334,
+          "hit@3": 0.9166666666666666,
+          "hit@5": 0.9166666666666666,
+          "doc_hit@5": 1.0,
+          "mrr": 0.888888888888889,
+          "ndcg@5": 0.8734395549255177
+        },
+        "scenario": {
+          "n": 10,
+          "hit@1": 0.7,
+          "hit@3": 1.0,
+          "hit@5": 1.0,
+          "doc_hit@5": 1.0,
+          "mrr": 0.8333333333333333,
+          "ndcg@5": 0.82670130704308
+        },
+        "rule_id": {
+          "n": 5,
+          "hit@1": 1.0,
+          "hit@3": 1.0,
+          "hit@5": 1.0,
+          "doc_hit@5": 1.0,
+          "mrr": 1.0,
+          "ndcg@5": 1.0
+        }
+      }
+    },
+    "default_120w": {
+      "n_chunks": 57,
+      "bm25": {
+        "all": {
+          "n": 43,
+          "hit@1": 0.7906976744186046,
+          "hit@1_ci95": [
+            0.6744186046511628,
+            0.9069767441860465
+          ],
+          "hit@3": 0.9534883720930233,
+          "hit@5": 0.9534883720930233,
+          "hit@5_ci95": [
+            0.8837209302325582,
+            1.0
+          ],
+          "doc_hit@5": 1.0,
+          "mrr": 0.8759689922480619,
+          "mrr_ci95": [
+            0.7984496124031006,
+            0.9457364341085273
+          ],
+          "ndcg@5": 0.8749808393233175
+        },
+        "direct": {
+          "n": 16,
+          "hit@1": 0.9375,
+          "hit@3": 1.0,
+          "hit@5": 1.0,
+          "doc_hit@5": 1.0,
+          "mrr": 0.96875,
+          "ndcg@5": 0.9769331095982161
+        },
+        "paraphrase": {
+          "n": 12,
+          "hit@1": 0.5,
+          "hit@3": 0.9166666666666666,
+          "hit@5": 0.9166666666666666,
+          "doc_hit@5": 1.0,
+          "mrr": 0.7083333333333334,
+          "ndcg@5": 0.7645533286744136
+        },
+        "scenario": {
+          "n": 10,
+          "hit@1": 0.8,
+          "hit@3": 0.9,
+          "hit@5": 0.9,
+          "doc_hit@5": 1.0,
+          "mrr": 0.8666666666666668,
+          "ndcg@5": 0.7818606393238234
+        },
+        "rule_id": {
+          "n": 5,
+          "hit@1": 1.0,
+          "hit@3": 1.0,
+          "hit@5": 1.0,
+          "doc_hit@5": 1.0,
+          "mrr": 1.0,
+          "ndcg@5": 1.0
+        }
+      },
+      "dense": {
+        "all": {
+          "n": 43,
+          "hit@1": 0.813953488372093,
+          "hit@1_ci95": [
+            0.6976744186046512,
+            0.9302325581395349
+          ],
+          "hit@3": 0.9534883720930233,
+          "hit@5": 1.0,
+          "hit@5_ci95": [
+            1.0,
+            1.0
+          ],
+          "doc_hit@5": 1.0,
+          "mrr": 0.8864341085271318,
+          "mrr_ci95": [
+            0.8127810077519378,
+            0.9573643410852715
+          ],
+          "ndcg@5": 0.8829895629367347
+        },
+        "direct": {
+          "n": 16,
+          "hit@1": 1.0,
+          "hit@3": 1.0,
+          "hit@5": 1.0,
+          "doc_hit@5": 1.0,
+          "mrr": 1.0,
+          "ndcg@5": 1.0
+        },
+        "paraphrase": {
+          "n": 12,
+          "hit@1": 0.8333333333333334,
+          "hit@3": 0.9166666666666666,
+          "hit@5": 1.0,
+          "doc_hit@5": 1.0,
+          "mrr": 0.8916666666666666,
+          "ndcg@5": 0.8792208785599703
+        },
+        "scenario": {
+          "n": 10,
+          "hit@1": 0.8,
+          "hit@3": 1.0,
+          "hit@5": 1.0,
+          "doc_hit@5": 1.0,
+          "mrr": 0.9,
+          "ndcg@5": 0.8356294351915097
+        },
+        "rule_id": {
+          "n": 5,
+          "hit@1": 0.2,
+          "hit@3": 0.8,
+          "hit@5": 1.0,
+          "doc_hit@5": 1.0,
+          "mrr": 0.4833333333333333,
+          "ndcg@5": 0.6123212623289701
+        }
+      },
+      "hybrid": {
+        "all": {
+          "n": 43,
+          "hit@1": 0.9069767441860465,
+          "hit@1_ci95": [
+            0.813953488372093,
+            0.9767441860465116
+          ],
+          "hit@3": 0.9767441860465116,
+          "hit@5": 0.9767441860465116,
+          "hit@5_ci95": [
+            0.9302325581395349,
+            1.0
+          ],
+          "doc_hit@5": 1.0,
+          "mrr": 0.9413067552602438,
+          "mrr_ci95": [
+            0.879831118493909,
+            0.9883720930232558
+          ],
+          "ndcg@5": 0.9374171232125706
+        },
+        "direct": {
+          "n": 16,
+          "hit@1": 1.0,
+          "hit@3": 1.0,
+          "hit@5": 1.0,
+          "doc_hit@5": 1.0,
+          "mrr": 1.0,
+          "ndcg@5": 1.0
+        },
+        "paraphrase": {
+          "n": 12,
+          "hit@1": 0.8333333333333334,
+          "hit@3": 0.9166666666666666,
+          "hit@5": 0.9166666666666666,
+          "doc_hit@5": 1.0,
+          "mrr": 0.873015873015873,
+          "ndcg@5": 0.8683100657623489
+        },
+        "scenario": {
+          "n": 10,
+          "hit@1": 0.9,
+          "hit@3": 1.0,
+          "hit@5": 1.0,
+          "doc_hit@5": 1.0,
+          "mrr": 0.95,
+          "ndcg@5": 0.9258285755420885
+        },
+        "rule_id": {
+          "n": 5,
+          "hit@1": 0.8,
+          "hit@3": 1.0,
+          "hit@5": 1.0,
+          "doc_hit@5": 1.0,
+          "mrr": 0.9,
+          "ndcg@5": 0.9261859507142916
+        }
+      }
+    },
+    "large_240w": {
+      "n_chunks": 57,
+      "bm25": {
+        "all": {
+          "n": 43,
+          "hit@1": 0.7906976744186046,
+          "hit@1_ci95": [
+            0.6744186046511628,
+            0.9069767441860465
+          ],
+          "hit@3": 0.9534883720930233,
+          "hit@5": 0.9534883720930233,
+          "hit@5_ci95": [
+            0.8837209302325582,
+            1.0
+          ],
+          "doc_hit@5": 1.0,
+          "mrr": 0.8759689922480619,
+          "mrr_ci95": [
+            0.7984496124031006,
+            0.9457364341085273
+          ],
+          "ndcg@5": 0.8749808393233175
+        },
+        "direct": {
+          "n": 16,
+          "hit@1": 0.9375,
+          "hit@3": 1.0,
+          "hit@5": 1.0,
+          "doc_hit@5": 1.0,
+          "mrr": 0.96875,
+          "ndcg@5": 0.9769331095982161
+        },
+        "paraphrase": {
+          "n": 12,
+          "hit@1": 0.5,
+          "hit@3": 0.9166666666666666,
+          "hit@5": 0.9166666666666666,
+          "doc_hit@5": 1.0,
+          "mrr": 0.7083333333333334,
+          "ndcg@5": 0.7645533286744136
+        },
+        "scenario": {
+          "n": 10,
+          "hit@1": 0.8,
+          "hit@3": 0.9,
+          "hit@5": 0.9,
+          "doc_hit@5": 1.0,
+          "mrr": 0.8666666666666668,
+          "ndcg@5": 0.7818606393238234
+        },
+        "rule_id": {
+          "n": 5,
+          "hit@1": 1.0,
+          "hit@3": 1.0,
+          "hit@5": 1.0,
+          "doc_hit@5": 1.0,
+          "mrr": 1.0,
+          "ndcg@5": 1.0
+        }
+      },
+      "dense": {
+        "all": {
+          "n": 43,
+          "hit@1": 0.813953488372093,
+          "hit@1_ci95": [
+            0.6976744186046512,
+            0.9302325581395349
+          ],
+          "hit@3": 0.9534883720930233,
+          "hit@5": 1.0,
+          "hit@5_ci95": [
+            1.0,
+            1.0
+          ],
+          "doc_hit@5": 1.0,
+          "mrr": 0.8864341085271318,
+          "mrr_ci95": [
+            0.8127810077519378,
+            0.9573643410852715
+          ],
+          "ndcg@5": 0.8829895629367347
+        },
+        "direct": {
+          "n": 16,
+          "hit@1": 1.0,
+          "hit@3": 1.0,
+          "hit@5": 1.0,
+          "doc_hit@5": 1.0,
+          "mrr": 1.0,
+          "ndcg@5": 1.0
+        },
+        "paraphrase": {
+          "n": 12,
+          "hit@1": 0.8333333333333334,
+          "hit@3": 0.9166666666666666,
+          "hit@5": 1.0,
+          "doc_hit@5": 1.0,
+          "mrr": 0.8916666666666666,
+          "ndcg@5": 0.8792208785599703
+        },
+        "scenario": {
+          "n": 10,
+          "hit@1": 0.8,
+          "hit@3": 1.0,
+          "hit@5": 1.0,
+          "doc_hit@5": 1.0,
+          "mrr": 0.9,
+          "ndcg@5": 0.8356294351915097
+        },
+        "rule_id": {
+          "n": 5,
+          "hit@1": 0.2,
+          "hit@3": 0.8,
+          "hit@5": 1.0,
+          "doc_hit@5": 1.0,
+          "mrr": 0.4833333333333333,
+          "ndcg@5": 0.6123212623289701
+        }
+      },
+      "hybrid": {
+        "all": {
+          "n": 43,
+          "hit@1": 0.9069767441860465,
+          "hit@1_ci95": [
+            0.813953488372093,
+            0.9767441860465116
+          ],
+          "hit@3": 0.9767441860465116,
+          "hit@5": 0.9767441860465116,
+          "hit@5_ci95": [
+            0.9302325581395349,
+            1.0
+          ],
+          "doc_hit@5": 1.0,
+          "mrr": 0.9413067552602438,
+          "mrr_ci95": [
+            0.879831118493909,
+            0.9883720930232558
+          ],
+          "ndcg@5": 0.9374171232125706
+        },
+        "direct": {
+          "n": 16,
+          "hit@1": 1.0,
+          "hit@3": 1.0,
+          "hit@5": 1.0,
+          "doc_hit@5": 1.0,
+          "mrr": 1.0,
+          "ndcg@5": 1.0
+        },
+        "paraphrase": {
+          "n": 12,
+          "hit@1": 0.8333333333333334,
+          "hit@3": 0.9166666666666666,
+          "hit@5": 0.9166666666666666,
+          "doc_hit@5": 1.0,
+          "mrr": 0.873015873015873,
+          "ndcg@5": 0.8683100657623489
+        },
+        "scenario": {
+          "n": 10,
+          "hit@1": 0.9,
+          "hit@3": 1.0,
+          "hit@5": 1.0,
+          "doc_hit@5": 1.0,
+          "mrr": 0.95,
+          "ndcg@5": 0.9258285755420885
+        },
+        "rule_id": {
+          "n": 5,
+          "hit@1": 0.8,
+          "hit@3": 1.0,
+          "hit@5": 1.0,
+          "doc_hit@5": 1.0,
+          "mrr": 0.9,
+          "ndcg@5": 0.9261859507142916
+        }
+      }
+    }
+  },
+  "abstention_signal_default_index": {
+    "dense_cosine": {
+      "mean_top1_answerable": 0.589508127334506,
+      "mean_top1_unanswerable": 0.19880991322653635,
+      "max_top1_unanswerable": 0.3849456310272217,
+      "min_top1_answerable": 0.40556180477142334,
+      "auroc_answerable_vs_unanswerable": 1.0
+    },
+    "bm25_normalised": {
+      "mean_top1_answerable": 0.4457047830883115,
+      "mean_top1_unanswerable": 0.07320157565832716,
+      "max_top1_unanswerable": 0.13816287726892443,
+      "min_top1_answerable": 0.12639390926035438,
+      "auroc_answerable_vs_unanswerable": 0.9933554817275747
+    }
+  },
+  "injection_tripwire": {
+    "flagged_documents": [
+      "ADV-001",
+      "ADV-002",
+      "ADV-003"
+    ],
+    "expected_flagged": [
+      "ADV-001",
+      "ADV-002",
+      "ADV-003"
+    ],
+    "missed_expected": [],
+    "misinformation_not_flagged_as_expected": [
+      "ADV-004",
+      "ADV-005"
+    ],
+    "false_positive_chunks_in_trusted_docs": 0,
+    "trusted_chunks": 57
+  },
+  "poisoning": {
+    "untrusted_included": {
+      "bm25": {
+        "adversarial_questions": [
+          {
+            "id": "A1",
+            "gold_rank": 2,
+            "poison_rank": 5,
+            "poison_outranks_gold": false,
+            "top1_trust": "trusted"
+          },
+          {
+            "id": "A2",
+            "gold_rank": 2,
+            "poison_rank": 1,
+            "poison_outranks_gold": true,
+            "top1_trust": "untrusted"
+          },
+          {
+            "id": "A3",
+            "gold_rank": null,
+            "poison_rank": 1,
+            "poison_outranks_gold": true,
+            "top1_trust": "untrusted"
+          },
+          {
+            "id": "A4",
+            "gold_rank": 5,
+            "poison_rank": 1,
+            "poison_outranks_gold": true,
+            "top1_trust": "untrusted"
+          },
+          {
+            "id": "A5",
+            "gold_rank": 4,
+            "poison_rank": 1,
+            "poison_outranks_gold": true,
+            "top1_trust": "untrusted"
+          },
+          {
+            "id": "A6",
+            "gold_rank": 2,
+            "poison_rank": 1,
+            "poison_outranks_gold": true,
+            "top1_trust": "untrusted"
+          }
+        ],
+        "poison_in_top5": 6,
+        "poison_outranks_gold": 5,
+        "top1_untrusted": 5,
+        "adversarial_gold_hit@5": 5,
+        "golden_hit@5_clean_index": 0.9534883720930233,
+        "golden_hit@5_with_poison_docs": 0.9534883720930233
+      },
+      "dense": {
+        "adversarial_questions": [
+          {
+            "id": "A1",
+            "gold_rank": 2,
+            "poison_rank": 1,
+            "poison_outranks_gold": true,
+            "top1_trust": "untrusted"
+          },
+          {
+            "id": "A2",
+            "gold_rank": 2,
+            "poison_rank": 1,
+            "poison_outranks_gold": true,
+            "top1_trust": "untrusted"
+          },
+          {
+            "id": "A3",
+            "gold_rank": null,
+            "poison_rank": 1,
+            "poison_outranks_gold": true,
+            "top1_trust": "untrusted"
+          },
+          {
+            "id": "A4",
+            "gold_rank": 2,
+            "poison_rank": 1,
+            "poison_outranks_gold": true,
+            "top1_trust": "untrusted"
+          },
+          {
+            "id": "A5",
+            "gold_rank": 2,
+            "poison_rank": 1,
+            "poison_outranks_gold": true,
+            "top1_trust": "untrusted"
+          },
+          {
+            "id": "A6",
+            "gold_rank": 2,
+            "poison_rank": 1,
+            "poison_outranks_gold": true,
+            "top1_trust": "untrusted"
+          }
+        ],
+        "poison_in_top5": 6,
+        "poison_outranks_gold": 6,
+        "top1_untrusted": 6,
+        "adversarial_gold_hit@5": 5,
+        "golden_hit@5_clean_index": 1.0,
+        "golden_hit@5_with_poison_docs": 1.0
+      },
+      "hybrid": {
+        "adversarial_questions": [
+          {
+            "id": "A1",
+            "gold_rank": 1,
+            "poison_rank": 3,
+            "poison_outranks_gold": false,
+            "top1_trust": "trusted"
+          },
+          {
+            "id": "A2",
+            "gold_rank": 2,
+            "poison_rank": 1,
+            "poison_outranks_gold": true,
+            "top1_trust": "untrusted"
+          },
+          {
+            "id": "A3",
+            "gold_rank": null,
+            "poison_rank": 1,
+            "poison_outranks_gold": true,
+            "top1_trust": "untrusted"
+          },
+          {
+            "id": "A4",
+            "gold_rank": 2,
+            "poison_rank": 1,
+            "poison_outranks_gold": true,
+            "top1_trust": "untrusted"
+          },
+          {
+            "id": "A5",
+            "gold_rank": 2,
+            "poison_rank": 1,
+            "poison_outranks_gold": true,
+            "top1_trust": "untrusted"
+          },
+          {
+            "id": "A6",
+            "gold_rank": 2,
+            "poison_rank": 1,
+            "poison_outranks_gold": true,
+            "top1_trust": "untrusted"
+          }
+        ],
+        "poison_in_top5": 6,
+        "poison_outranks_gold": 5,
+        "top1_untrusted": 5,
+        "adversarial_gold_hit@5": 5,
+        "golden_hit@5_clean_index": 0.9767441860465116,
+        "golden_hit@5_with_poison_docs": 0.9767441860465116
+      }
+    },
+    "default_trusted_only": {
+      "bm25": {
+        "adversarial_questions": [
+          {
+            "id": "A1",
+            "gold_rank": 2,
+            "poison_rank": null,
+            "poison_outranks_gold": false,
+            "top1_trust": "trusted"
+          },
+          {
+            "id": "A2",
+            "gold_rank": 1,
+            "poison_rank": null,
+            "poison_outranks_gold": false,
+            "top1_trust": "trusted"
+          },
+          {
+            "id": "A3",
+            "gold_rank": null,
+            "poison_rank": null,
+            "poison_outranks_gold": false,
+            "top1_trust": "trusted"
+          },
+          {
+            "id": "A4",
+            "gold_rank": 4,
+            "poison_rank": null,
+            "poison_outranks_gold": false,
+            "top1_trust": "trusted"
+          },
+          {
+            "id": "A5",
+            "gold_rank": 3,
+            "poison_rank": null,
+            "poison_outranks_gold": false,
+            "top1_trust": "trusted"
+          },
+          {
+            "id": "A6",
+            "gold_rank": 1,
+            "poison_rank": null,
+            "poison_outranks_gold": false,
+            "top1_trust": "trusted"
+          }
+        ],
+        "poison_in_top5": 0,
+        "poison_outranks_gold": 0,
+        "top1_untrusted": 0,
+        "adversarial_gold_hit@5": 5,
+        "golden_hit@5_clean_index": 0.9534883720930233,
+        "golden_hit@5_with_poison_docs": 0.9534883720930233
+      },
+      "dense": {
+        "adversarial_questions": [
+          {
+            "id": "A1",
+            "gold_rank": 1,
+            "poison_rank": null,
+            "poison_outranks_gold": false,
+            "top1_trust": "trusted"
+          },
+          {
+            "id": "A2",
+            "gold_rank": 1,
+            "poison_rank": null,
+            "poison_outranks_gold": false,
+            "top1_trust": "trusted"
+          },
+          {
+            "id": "A3",
+            "gold_rank": null,
+            "poison_rank": null,
+            "poison_outranks_gold": false,
+            "top1_trust": "trusted"
+          },
+          {
+            "id": "A4",
+            "gold_rank": 1,
+            "poison_rank": null,
+            "poison_outranks_gold": false,
+            "top1_trust": "trusted"
+          },
+          {
+            "id": "A5",
+            "gold_rank": 1,
+            "poison_rank": null,
+            "poison_outranks_gold": false,
+            "top1_trust": "trusted"
+          },
+          {
+            "id": "A6",
+            "gold_rank": 1,
+            "poison_rank": null,
+            "poison_outranks_gold": false,
+            "top1_trust": "trusted"
+          }
+        ],
+        "poison_in_top5": 0,
+        "poison_outranks_gold": 0,
+        "top1_untrusted": 0,
+        "adversarial_gold_hit@5": 5,
+        "golden_hit@5_clean_index": 1.0,
+        "golden_hit@5_with_poison_docs": 1.0
+      },
+      "hybrid": {
+        "adversarial_questions": [
+          {
+            "id": "A1",
+            "gold_rank": 1,
+            "poison_rank": null,
+            "poison_outranks_gold": false,
+            "top1_trust": "trusted"
+          },
+          {
+            "id": "A2",
+            "gold_rank": 1,
+            "poison_rank": null,
+            "poison_outranks_gold": false,
+            "top1_trust": "trusted"
+          },
+          {
+            "id": "A3",
+            "gold_rank": null,
+            "poison_rank": null,
+            "poison_outranks_gold": false,
+            "top1_trust": "trusted"
+          },
+          {
+            "id": "A4",
+            "gold_rank": 1,
+            "poison_rank": null,
+            "poison_outranks_gold": false,
+            "top1_trust": "trusted"
+          },
+          {
+            "id": "A5",
+            "gold_rank": 1,
+            "poison_rank": null,
+            "poison_outranks_gold": false,
+            "top1_trust": "trusted"
+          },
+          {
+            "id": "A6",
+            "gold_rank": 1,
+            "poison_rank": null,
+            "poison_outranks_gold": false,
+            "top1_trust": "trusted"
+          }
+        ],
+        "poison_in_top5": 0,
+        "poison_outranks_gold": 0,
+        "top1_untrusted": 0,
+        "adversarial_gold_hit@5": 5,
+        "golden_hit@5_clean_index": 0.9767441860465116,
+        "golden_hit@5_with_poison_docs": 0.9767441860465116
+      }
+    }
+  }
+}

@@ -1,0 +1,564 @@
+{
+ "description": "Hand-written retrieval questions for the SYNTHETIC knowledge base. Gold = (document_id, section_id); any listed gold section counts as a hit. Single author (also wrote the documents): see docs/research/experiments.md for the limits.",
+ "questions": [
+  {
+   "id": "Q01",
+   "type": "direct",
+   "question": "What is the maximum posting lag before a ledger posting is considered late?",
+   "gold": [
+    [
+     "KB-REC-002",
+     "posting-window"
+    ],
+    [
+     "KB-REC-001",
+     "posting-time-problems-rec-007-and-rec-008"
+    ]
+   ]
+  },
+  {
+   "id": "Q02",
+   "type": "direct",
+   "question": "Which document types are accepted for identity verification?",
+   "gold": [
+    [
+     "KB-KYC-002",
+     "accepted-documents"
+    ]
+   ]
+  },
+  {
+   "id": "Q03",
+   "type": "direct",
+   "question": "What must be done when an identity document has expired?",
+   "gold": [
+    [
+     "KB-KYC-002",
+     "document-expiry"
+    ]
+   ]
+  },
+  {
+   "id": "Q04",
+   "type": "direct",
+   "question": "How are document numbers normalised before they are compared?",
+   "gold": [
+    [
+     "KB-KYC-002",
+     "document-number-handling"
+    ]
+   ]
+  },
+  {
+   "id": "Q05",
+   "type": "direct",
+   "question": "What should an analyst do when the date of birth differs between the document and the record?",
+   "gold": [
+    [
+     "KB-KYC-001",
+     "date-of-birth-conflicts"
+    ]
+   ]
+  },
+  {
+   "id": "Q06",
+   "type": "direct",
+   "question": "Can two customer records be merged automatically?",
+   "gold": [
+    [
+     "KB-KYC-001",
+     "duplicate-customer-records"
+    ]
+   ]
+  },
+  {
+   "id": "Q07",
+   "type": "direct",
+   "question": "What is a burst of transactions?",
+   "gold": [
+    [
+     "KB-TXN-001",
+     "rapid-bursts"
+    ]
+   ]
+  },
+  {
+   "id": "Q08",
+   "type": "direct",
+   "question": "What counts as abnormal velocity?",
+   "gold": [
+    [
+     "KB-TXN-001",
+     "abnormal-velocity"
+    ]
+   ]
+  },
+  {
+   "id": "Q09",
+   "type": "direct",
+   "question": "How many identical transfers form a repeated-transfer pattern?",
+   "gold": [
+    [
+     "KB-TXN-001",
+     "repeated-identical-transfers"
+    ]
+   ]
+  },
+  {
+   "id": "Q10",
+   "type": "direct",
+   "question": "What are the three decision states for a case?",
+   "gold": [
+    [
+     "KB-GOV-001",
+     "decision-states"
+    ],
+    [
+     "KB-TXN-002",
+     "decisions"
+    ]
+   ]
+  },
+  {
+   "id": "Q11",
+   "type": "direct",
+   "question": "Who must confirm an ESCALATE decision?",
+   "gold": [
+    [
+     "KB-GOV-001",
+     "four-eyes-principle-for-escalations"
+    ]
+   ]
+  },
+  {
+   "id": "Q12",
+   "type": "direct",
+   "question": "How long are audit records retained?",
+   "gold": [
+    [
+     "KB-GOV-002",
+     "retention"
+    ]
+   ]
+  },
+  {
+   "id": "Q13",
+   "type": "direct",
+   "question": "Which personal data may appear in logs and reports?",
+   "gold": [
+    [
+     "KB-GOV-003",
+     "personal-data-in-logs-and-reports"
+    ]
+   ]
+  },
+  {
+   "id": "Q14",
+   "type": "direct",
+   "question": "What does a medium confidence band mean for a match?",
+   "gold": [
+    [
+     "KB-KYC-003",
+     "confidence-bands"
+    ]
+   ]
+  },
+  {
+   "id": "Q15",
+   "type": "direct",
+   "question": "How is the severity of an amount mismatch determined?",
+   "gold": [
+    [
+     "KB-REC-001",
+     "amount-mismatch-rec-003"
+    ]
+   ]
+  },
+  {
+   "id": "Q16",
+   "type": "direct",
+   "question": "What must a report include for every important claim?",
+   "gold": [
+    [
+     "KB-AI-001",
+     "evidence-citation"
+    ]
+   ]
+  },
+  {
+   "id": "Q17",
+   "type": "paraphrase",
+   "question": "How long can the bank take to record a payment before we start to worry?",
+   "gold": [
+    [
+     "KB-REC-002",
+     "posting-window"
+    ],
+    [
+     "KB-REC-001",
+     "posting-time-problems-rec-007-and-rec-008"
+    ]
+   ]
+  },
+  {
+   "id": "Q18",
+   "type": "paraphrase",
+   "question": "A customer's ID card is out of date. What happens to their verification status?",
+   "gold": [
+    [
+     "KB-KYC-002",
+     "document-expiry"
+    ]
+   ]
+  },
+  {
+   "id": "Q19",
+   "type": "paraphrase",
+   "question": "The name is spelled Muhammad on the form but Mohammed in our system. Is that a reason to refuse?",
+   "gold": [
+    [
+     "KB-KYC-001",
+     "name-variations"
+    ]
+   ]
+  },
+  {
+   "id": "Q20",
+   "type": "paraphrase",
+   "question": "Two different people happen to have the same name. How do I avoid linking them?",
+   "gold": [
+    [
+     "KB-KYC-001",
+     "namesakes"
+    ]
+   ]
+  },
+  {
+   "id": "Q21",
+   "type": "paraphrase",
+   "question": "The customer moved house and the ID shows their old street. Is that a problem?",
+   "gold": [
+    [
+     "KB-KYC-001",
+     "address-mismatches"
+    ]
+   ]
+  },
+  {
+   "id": "Q22",
+   "type": "paraphrase",
+   "question": "Many small payments to the same person within a few minutes. What pattern is this?",
+   "gold": [
+    [
+     "KB-TXN-001",
+     "rapid-bursts"
+    ]
+   ]
+  },
+  {
+   "id": "Q23",
+   "type": "paraphrase",
+   "question": "Money arrives in an account and leaves again almost immediately. What might that indicate?",
+   "gold": [
+    [
+     "KB-TXN-003",
+     "rapid-movement-of-funds"
+    ]
+   ]
+  },
+  {
+   "id": "Q24",
+   "type": "paraphrase",
+   "question": "Can the software shut down a customer's account on its own?",
+   "gold": [
+    [
+     "KB-GOV-001",
+     "actions-the-system-must-never-take"
+    ]
+   ]
+  },
+  {
+   "id": "Q25",
+   "type": "paraphrase",
+   "question": "What should a report do when it has no evidence for a statement?",
+   "gold": [
+    [
+     "KB-AI-001",
+     "evidence-citation"
+    ],
+    [
+     "KB-AI-001",
+     "unsupported-claims"
+    ]
+   ]
+  },
+  {
+   "id": "Q26",
+   "type": "paraphrase",
+   "question": "A retrieved file tells the assistant to change the outcome of the case. Should it comply?",
+   "gold": [
+    [
+     "KB-AI-001",
+     "text-found-inside-retrieved-documents"
+    ]
+   ]
+  },
+  {
+   "id": "Q27",
+   "type": "paraphrase",
+   "question": "Which staff roles may see the audit trail but not alter decisions?",
+   "gold": [
+    [
+     "KB-GOV-003",
+     "access-control"
+    ]
+   ]
+  },
+  {
+   "id": "Q28",
+   "type": "paraphrase",
+   "question": "Is it acceptable to send customer data to an outside AI provider?",
+   "gold": [
+    [
+     "KB-GOV-003",
+     "on-premise-processing"
+    ]
+   ]
+  },
+  {
+   "id": "Q29",
+   "type": "scenario",
+   "question": "A customer sent 25 times their usual amount at 3am to a new payee in another country. What should the analyst consider?",
+   "gold": [
+    [
+     "KB-TXN-002",
+     "combining-signals"
+    ],
+    [
+     "KB-TXN-001",
+     "high-value-transactions"
+    ],
+    [
+     "KB-TXN-001",
+     "unusual-transaction-time"
+    ],
+    [
+     "KB-TXN-001",
+     "geographic-change"
+    ],
+    [
+     "KB-TXN-002",
+     "legitimate-explanations-to-consider"
+    ]
+   ]
+  },
+  {
+   "id": "Q30",
+   "type": "scenario",
+   "question": "The ledger shows the same transaction posted twice. What is the risk and who approves the fix?",
+   "gold": [
+    [
+     "KB-REC-001",
+     "duplicate-posting-rec-002"
+    ]
+   ]
+  },
+  {
+   "id": "Q31",
+   "type": "scenario",
+   "question": "The ledger posting is dated before the transaction took place.",
+   "gold": [
+    [
+     "KB-REC-001",
+     "posting-time-problems-rec-007-and-rec-008"
+    ]
+   ]
+  },
+  {
+   "id": "Q32",
+   "type": "scenario",
+   "question": "The transaction is in USD but the ledger recorded EUR.",
+   "gold": [
+    [
+     "KB-REC-001",
+     "currency-mismatch-rec-004"
+    ]
+   ]
+  },
+  {
+   "id": "Q33",
+   "type": "scenario",
+   "question": "Four transfers of exactly 950 went to the same new beneficiary within ten days.",
+   "gold": [
+    [
+     "KB-TXN-001",
+     "repeated-identical-transfers"
+    ],
+    [
+     "KB-TXN-003",
+     "structuring"
+    ]
+   ]
+  },
+  {
+   "id": "Q34",
+   "type": "scenario",
+   "question": "The matcher gave a high name score but date of birth and address both differ. Match or namesake?",
+   "gold": [
+    [
+     "KB-KYC-003",
+     "contradictory-evidence"
+    ],
+    [
+     "KB-KYC-001",
+     "namesakes"
+    ]
+   ]
+  },
+  {
+   "id": "Q35",
+   "type": "scenario",
+   "question": "Three matcher candidates have nearly identical scores. What now?",
+   "gold": [
+    [
+     "KB-KYC-003",
+     "when-automated-matching-is-not-enough"
+    ]
+   ]
+  },
+  {
+   "id": "Q36",
+   "type": "scenario",
+   "question": "A settlement is still pending a week after the transaction.",
+   "gold": [
+    [
+     "KB-REC-002",
+     "pending-settlements"
+    ],
+    [
+     "KB-REC-001",
+     "settlement-status-rec-009-and-rec-010"
+    ]
+   ]
+  },
+  {
+   "id": "Q37",
+   "type": "scenario",
+   "question": "A customer made twenty transactions today but usually makes three a week.",
+   "gold": [
+    [
+     "KB-TXN-001",
+     "abnormal-velocity"
+    ]
+   ]
+  },
+  {
+   "id": "Q38",
+   "type": "scenario",
+   "question": "The second reviewer disagrees with the proposed escalation.",
+   "gold": [
+    [
+     "KB-GOV-001",
+     "four-eyes-principle-for-escalations"
+    ]
+   ]
+  },
+  {
+   "id": "Q39",
+   "type": "rule_id",
+   "question": "REC-001",
+   "gold": [
+    [
+     "KB-REC-001",
+     "missing-ledger-entry-rec-001"
+    ]
+   ]
+  },
+  {
+   "id": "Q40",
+   "type": "rule_id",
+   "question": "What does rule REC-006 mean?",
+   "gold": [
+    [
+     "KB-REC-001",
+     "reference-problems-rec-005-and-rec-006"
+    ]
+   ]
+  },
+  {
+   "id": "Q41",
+   "type": "rule_id",
+   "question": "REC-008 severity",
+   "gold": [
+    [
+     "KB-REC-001",
+     "posting-time-problems-rec-007-and-rec-008"
+    ]
+   ]
+  },
+  {
+   "id": "Q42",
+   "type": "rule_id",
+   "question": "REC-004",
+   "gold": [
+    [
+     "KB-REC-001",
+     "currency-mismatch-rec-004"
+    ]
+   ]
+  },
+  {
+   "id": "Q43",
+   "type": "rule_id",
+   "question": "REC-009 and REC-010 status",
+   "gold": [
+    [
+     "KB-REC-001",
+     "settlement-status-rec-009-and-rec-010"
+    ]
+   ]
+  },
+  {
+   "id": "Q44",
+   "type": "unanswerable",
+   "question": "What is the capital adequacy ratio requirement?",
+   "gold": []
+  },
+  {
+   "id": "Q45",
+   "type": "unanswerable",
+   "question": "What is on the cafeteria menu today?",
+   "gold": []
+  },
+  {
+   "id": "Q46",
+   "type": "unanswerable",
+   "question": "What interest rate applies to a savings account?",
+   "gold": []
+  },
+  {
+   "id": "Q47",
+   "type": "unanswerable",
+   "question": "How do I train a convolutional neural network?",
+   "gold": []
+  },
+  {
+   "id": "Q48",
+   "type": "unanswerable",
+   "question": "Who won the football world cup in 2022?",
+   "gold": []
+  },
+  {
+   "id": "Q49",
+   "type": "unanswerable",
+   "question": "What are the opening hours of the branch?",
+   "gold": []
+  },
+  {
+   "id": "Q50",
+   "type": "unanswerable",
+   "question": "Which regulator fines banks for late reporting?",
+   "gold": []
+  }
+ ]
+}

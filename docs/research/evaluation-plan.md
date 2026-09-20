@@ -62,6 +62,24 @@ correctness check, not a measure of real-world quality** (both are deterministic
 data ranges in view). Independent evidence is the hand-built edge cases in `backend/tests/reconciliation/`
 (tolerance boundaries, duplicate ordering, float noise, currency+amount together, immutability).
 
-## LLM/RAG, agents, guardrails
+## Knowledge-base retrieval (Phase 7; implemented)
 
-Defined in Phases 7 onwards.
+Runner: `experiments/rag/run_retrieval_benchmark.py` (`make rag-benchmark`, about 1 minute).
+Golden set: `evaluation/golden_dataset/kb_retrieval_questions.json` (50 hand-written questions: 16 direct, 12 paraphrased,
+10 case-style scenarios, 5 rule-id lookups, 7 unanswerable). Adversarial set: `evaluation/adversarial_dataset/kb_injection*`.
+Gold = (document, section); any listed gold section counts as a hit.
+
+| Metric | Definition |
+|---|---|
+| hit@k | a gold section appears among the top-k chunks (section level); doc hit@k ignores the section |
+| MRR, nDCG@5 | rank of the first gold hit; binary-relevance nDCG (each gold section counted once) |
+| abstention AUROC | how well the top-1 score separates answerable from unanswerable questions |
+| injection tripwire | recall of flagged adversarial documents and false-positive chunks among trusted ones |
+| poison exposure | for topically matching untrusted documents: in top-5, outranks gold, top-1; with and without the trust filter |
+
+95% CIs resample questions (n=43). Limits: one author wrote documents and questions, so vocabulary overlap may flatter lexical
+retrieval; n is small; the 7 unanswerable questions make the abstention result fragile.
+
+## LLM grounding, agents, guardrails
+
+Defined in Phases 8 onwards (RQ3, RQ4 need the LLM).

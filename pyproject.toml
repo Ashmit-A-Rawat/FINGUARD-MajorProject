@@ -45,7 +45,7 @@ markers = [
 [tool.ruff]
 line-length = 100
 target-version = "py311"
-extend-exclude = ["frontend", ".venv"]
+extend-exclude = ["frontend", ".venv", "backend/tests/knowledge_base/kb_helpers.py"]
 
 [[tool.mypy.overrides]]
 module = ["pandas.*", "sklearn.*", "sentence_transformers.*"]
@@ -61,4 +61,5 @@ select = ["E", "F", "I", "UP", "B", "SIM"]
 python_version = "3.11"
 strict = true
 plugins = ["pydantic.mypy"]
-exclude = ["frontend", ".venv"]
+mypy_path = ["backend/tests/knowledge_base"]  # plain (non-package) test helper modules
+exclude = ["frontend", ".venv", "backend/tests/knowledge_base/kb_helpers.py"]

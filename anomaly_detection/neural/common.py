@@ -10,9 +10,8 @@ from sklearn.preprocessing import StandardScaler
 from torch import nn
 
 DEVICE = torch.device("cpu")  # small models; CPU keeps runs reproducible
-# PyTorch's default OpenMP pool DEADLOCKS (0% CPU, no error) when it runs in a process where
-# XGBoost / scikit-learn have already used theirs (macOS, clashing libomp copies). A single
-# thread avoids that and makes training bit-for-bit reproducible.
+# One thread: reproducible training, and consistent with the process-wide OpenMP limit
+# (see backend/app/core/runtime.py for the clash this avoids).
 torch.set_num_threads(1)
 
 

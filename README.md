@@ -6,7 +6,7 @@ An on-premise multi-agent AI system for automated KYC verification and financial
 
 ## Status
 
-Phases 1-6 complete: skeleton, schemas + synthetic data generator, data pipeline, KYC entity resolution, transaction anomaly detection, rule-based reconciliation. RAG, LLM and agents are not built yet.
+Phases 1-7 complete: skeleton, schemas + synthetic data generator, data pipeline, KYC entity resolution, transaction anomaly detection, rule-based reconciliation, knowledge base with retrieval. The LLM layer and agents are not built yet.
 
 ## Architecture
 
@@ -33,6 +33,7 @@ cp .env.example .env
 | Generate data | `make data` or `python scripts/generate_synthetic_data.py --preset small` (see [data architecture](docs/architecture/data-architecture.md)) |
 | Data pipeline | `make pipeline` |
 | KYC benchmark / ablation | `make kyc-benchmark` (report in `evaluation/reports/kyc/`) |
+| Knowledge-base retrieval benchmark | `make rag-benchmark` |
 | Reconciliation eval | `make reconciliation-eval` |
 | Anomaly benchmark | `make anomaly-benchmark` (report in `evaluation/reports/anomaly/`); progress: `scripts/run_status.sh <log>` |
 | Frontend | *Phase 11* |
@@ -42,3 +43,12 @@ cp .env.example .env
 ## Research questions
 
 See [docs/research/research-questions.md](docs/research/research-questions.md).
+
+## Troubleshooting (macOS)
+
+- `ModuleNotFoundError: No module named 'backend'` when running a script: macOS marks files inside dot-directories
+  (like `.venv`) as *hidden*, and Python silently ignores hidden `.pth` files, so the editable install stops working.
+  Use `make` targets (they set `PYTHONPATH=.`), run `PYTHONPATH=. python scripts/...`, or run `chflags -R nohidden .venv`.
+- Crashes (exit code 139) or silent hangs at 0% CPU when PyTorch, XGBoost, scikit-learn or ChromaDB share a process:
+  caused by two OpenMP runtimes. `backend/app/core/runtime.py` limits OpenMP to one thread; it is applied automatically
+  by the `kyc`, `anomaly_detection` and `knowledge_base` packages. Do not import `torch` before them in a new entry point.

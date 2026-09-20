@@ -146,3 +146,44 @@ messy real ledgers (rounding conventions, FX, partial settlements, timezone diff
   16,077 of 250,000 transactions (6.4%) have at least one finding, but only 3,750 (1.5%) are injected discrepancies.
   Downstream consumers (the agents) should treat core and status findings differently.
 - Sender/receiver cannot be reconciled: the ledger schema has no counterparty fields.
+
+## EXP-RAG-01: Knowledge-base retrieval, abstention signal, injection and poisoning (supports RQ3 groundwork)
+
+- Script: `experiments/rag/run_retrieval_benchmark.py` (`make rag-benchmark`); artifact: `evaluation/reports/rag/retrieval_benchmark.{json,md}`
+- Corpus: 12 synthetic policy documents (57 chunks at default chunking). Embedding model `sentence-transformers/all-MiniLM-L6-v2`.
+- 43 answerable + 7 unanswerable hand-written questions (same author as the documents). Single run (retrieval is deterministic).
+
+### Retrieval (default chunking, 120 words; section-level)
+
+| mode | hit@1 [95% CI] | hit@5 [95% CI] | MRR [95% CI] |
+|---|---|---|---|
+| BM25 | 0.791 [0.67, 0.91] | 0.953 [0.88, 1.00] | 0.876 [0.80, 0.95] |
+| dense (MiniLM + Chroma) | 0.814 [0.70, 0.93] | 1.000 [1.00, 1.00] | 0.886 [0.81, 0.96] |
+| hybrid (RRF) | 0.907 [0.81, 0.98] | 0.977 [0.93, 1.00] | 0.941 [0.88, 0.99] |
+
+### What the data supports
+1. **All three modes retrieve the right section within the top 5 for 95-100% of questions**, including paraphrased and case-style
+   ones. hit@5 is near the ceiling, so it cannot separate the methods on this corpus.
+2. **Hybrid ranks the right section first more often** (hit@1 0.91 vs 0.79-0.81; MRR 0.94 vs 0.88-0.89). The direction is
+   consistent across hit@1, MRR and nDCG, but the confidence intervals for hit@1 overlap with 43 questions, so I do not
+   claim a significant win. A larger, independently written question set is needed.
+3. **Chunk size made no measurable difference.** 120 and 240 words give identical indexes (57 chunks: every section is under
+   120 words), and 40-word chunks (101 chunks) were not better. On a corpus of short sections, section-level chunking is enough.
+4. **Unanswerable questions are separable by top-1 score**: dense cosine AUROC 1.000 (highest unanswerable 0.385 vs lowest answerable
+   0.406, a margin of only 0.02) and normalised BM25 0.993 (highest unanswerable 0.138 vs lowest answerable 0.126). With only 7 unanswerable
+   questions this is suggestive, not a calibrated abstention threshold. Any threshold must be chosen on held-out data.
+5. **Injection tripwire**: flagged all 3 documents with imperative injection text (override, role reassignment, fake tags plus hidden
+   HTML comment and zero-width characters, which cleaning also removed and counted), with **0 false positives across 57 trusted chunks**. It
+   cannot see the 2 misinformation documents (they contain no instruction-like text), as expected.
+6. **Poisoning is the key result.** With untrusted, topically matching documents in the index and the caller opting in, the poisoned document
+   appeared in the top 5 for **6/6** adversarial queries in every mode and was top-1 for **5/6 (BM25, hybrid) and 6/6 (dense)**. Retrieval ranking gives no protection.
+   With the default policy (untrusted excluded) poison exposure is **0/6** in every mode and normal-question hit@5 is unchanged. This is a
+   trivial filter, and it works **only because the poisoned documents came from an untrusted source directory**.
+
+### Threats to validity
+- Same author wrote documents and questions; small n; questions may share vocabulary with the text.
+- The adversarial documents were written to compete with specific sections (same headings); real poisoning could be subtler or weaker.
+- One adversarial question (A3, "How can transaction review be done faster?") has a weak gold label; no mode retrieved it, so
+  "gold in top-5" is 5/6 everywhere. Treat that as a question-quality issue, not a retrieval finding.
+- A poisoned document inside a trusted source is not addressed by this layer.
+- No LLM is involved yet; this says nothing about answer quality or grounding (RQ3), only that the right evidence can be found.

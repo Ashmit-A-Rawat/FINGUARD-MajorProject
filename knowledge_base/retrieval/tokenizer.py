@@ -1,0 +1,68 @@
+import re
+
+STOPWORDS = frozenset(
+    [
+        "a",
+        "an",
+        "and",
+        "are",
+        "as",
+        "at",
+        "be",
+        "by",
+        "can",
+        "do",
+        "does",
+        "for",
+        "from",
+        "has",
+        "have",
+        "how",
+        "i",
+        "if",
+        "in",
+        "into",
+        "is",
+        "it",
+        "its",
+        "of",
+        "on",
+        "or",
+        "that",
+        "the",
+        "their",
+        "there",
+        "these",
+        "this",
+        "to",
+        "was",
+        "what",
+        "when",
+        "where",
+        "which",
+        "who",
+        "why",
+        "will",
+        "with",
+        "you",
+        "your",
+        "should",
+        "must",
+        "may",
+        "not",
+        "no",
+        "than",
+        "then",
+        "so",
+        "such",
+        "any",
+        "all",
+        "each",
+    ]
+)
+_TOKEN = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
+
+
+def tokenize(text: str) -> list[str]:
+    """Lower-case word tokens; keeps ids like 'rec-008' whole and drops stop-words."""
+    return [t for t in _TOKEN.findall(text.lower()) if t not in STOPWORDS]
