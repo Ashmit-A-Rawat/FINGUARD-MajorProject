@@ -37,6 +37,5 @@ llm/models/*/
 *.db
 *.sqlite
 
-# fine-tuned adapters and generated training data (regenerable)
+# fine-tuned adapter weights (data/finetune is committed so every machine trains on identical data)
 llm/fine_tuning/adapters/
-data/finetune/

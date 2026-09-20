@@ -1,0 +1,27 @@
+{
+  "note": "SYNTHETIC. Targets are functions of the evidence (teacher.py); labels: evaluation only.",
+  "seed": 7,
+  "boundaries": {
+    "anomaly_model_trained_until": "2025-04-25T09:47:23.400000000",
+    "eval_starts": "2025-05-29T06:07:56.200000000"
+  },
+  "counts": {
+    "train": 242,
+    "val": 22,
+    "eval": 24,
+    "eval_injected": 8
+  },
+  "train_by_category": {
+    "reconciliation": 65,
+    "clean": 115,
+    "behavioural": 62
+  },
+  "train_injected": 54,
+  "train_truth_problem_share": 0.5247933884297521,
+  "eval_by_category": {
+    "reconciliation": 8,
+    "behavioural": 8,
+    "clean": 8
+  },
+  "customers_overlap_train_eval": 0
+}

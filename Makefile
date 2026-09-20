@@ -1,6 +1,6 @@
 PY := PYTHONPATH=. .venv/bin/python
 
-.PHONY: install test lint typecheck run data pipeline kyc-benchmark anomaly-benchmark reconciliation-eval rag-benchmark hardware llm-check agents-demo guardrail-eval api frontend-dev frontend-test
+.PHONY: install test lint typecheck run data pipeline kyc-benchmark anomaly-benchmark reconciliation-eval rag-benchmark hardware llm-check agents-demo guardrail-eval finetune-data train-lora finetune-eval api frontend-dev frontend-test
 install:
 	$(PY) -m pip install -e ".[dev]"
 test:
@@ -38,3 +38,9 @@ frontend-dev:
 	cd frontend && npm run dev
 frontend-test:
 	cd frontend && npm run build && npm test
+finetune-data:
+	$(PY) scripts/build_finetune_dataset.py
+train-lora:
+	$(PY) scripts/train_lora.py
+finetune-eval:
+	$(PY) experiments/llm/run_finetune_eval.py
