@@ -74,7 +74,7 @@ CASE_CREATED -> DATA_READY -> KYC_ANALYZED -> ANOMALY_ANALYZED -> RECONCILED -> 
 | Auditor | KYC verification (matcher: BM25 + dense + DOB/address) and anomaly scoring (XGBoost, top score drivers) | `KYCAnalysisInput -> KYCAnalysisOutput`; `AnomalyAnalysisInput -> AnomalyAnalysisOutput` | no |
 | Reconciliation | transaction vs ledger rules for the case | `ReconciliationInput -> ReconciliationOutput` | no |
 | Investigator | targeted knowledge retrieval, then a structured advisory investigation | `RetrievalInput -> RetrievalOutput`; `InvestigationInput -> InvestigationResult` | **yes** |
-| Reviewer / critic | checks the investigation before a human sees it; plug-in `Validator`s | `ReviewInput -> ReviewOutput` | (Phase 10) |
+| Reviewer / critic | verifies every claim against the cited evidence and applies the deterministic policy floor (`guardrails/`, see [LLM architecture](llm-architecture.md#guardrails-phase-10-guardrails)); plug-in `Validator`s | `ReviewInput -> ReviewOutput` | no (deliberately) |
 | Report | assembles the explainable report | `ReportInput -> CaseReport` | no |
 
 Rules that keep responsibilities from overlapping: an agent reads only its declared input and returns only its declared output; **only the

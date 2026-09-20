@@ -251,8 +251,8 @@ matching the generator's labels in all 6; the single-agent baseline gave CLEAR (
 
 ### What the data supports, and what it does not
 1. **Orchestration overhead is negligible in wall-clock terms**: everything except the LLM call costs about 0.3 s per case (under 1%). The LLM is essentially the whole cost.
-2. **The 9 s gap between the two variants is not orchestration.** It comes from the multi-agent prompt being richer (KYC match evidence, a reconciliation-history summary and up to 4 targeted reference chunks versus 2
-   generic ones), so the model reads and writes more. RQ5's cost is therefore "more context to the LLM", not "more agents".
+2. **(Superseded, see the correction in EXP-AGENTS-02.)** *The 9 s gap between the two variants is not orchestration; it comes from the multi-agent prompt being richer (KYC match evidence, a reconciliation-history summary and up to 4 targeted reference chunks versus 2
+   generic ones), so the model reads and writes more.* The gap did not reproduce in a second run.
 3. **The decision difference (6/6 vs 4/6) is anecdotal.** n=6, one run each, a small model whose decisions vary between runs (EXP-LLM-01), and several things differ between the variants (extra evidence, targeted retrieval), so
    the cause cannot be attributed to orchestration. It does fit the earlier finding that the model judges better when engines state their verdict in the evidence, which this run supports only tentatively.
    No claim about accuracy is made; that needs the Phase 13 ablation with many cases, repeated runs and confidence intervals.
@@ -262,3 +262,66 @@ matching the generator's labels in all 6; the single-agent baseline gave CLEAR (
 - 6 cases, one run, one model; latency measured on one machine with one thread for numeric libraries (OMP=1).
 - The workflow trains its anomaly model on labelled history at startup; cases were restricted to the held-out period, but the same synthetic generator produced train and test data.
 - Nothing here is validated (Phase 10): the "matching labels" observation is about proposals, not about whether the reasoning was supported by evidence.
+
+## EXP-GUARD-01: Guardrails (evidence validator + policy floor) (supports RQ4)
+
+- Script: `experiments/guardrails/run_guardrail_eval.py` (`make guardrail-eval`); artifacts: `evaluation/reports/guardrails/guardrail_eval.json` and `guardrail_eval_before_format_fixes.json` (kept for transparency).
+- Part A: claim-perturbation benchmark on the 28 EXP-LLM-01 cases. Part B: the guardrails applied to the 28 real Qwen2.5-1.5B outputs saved by EXP-LLM-01 (evidence rebuilt deterministically).
+
+### Part A: correctness check with ground truth by construction
+155 claims derived from real evidence by template: **155/155 recognised as supported (0 false alarms)**. Corrupted versions (each should be flagged unsupported):
+
+| perturbation | n | flagged unsupported |
+|---|---|---|
+| unknown evidence id cited | 155 | 100% |
+| citation removed | 155 | 100% |
+| true value cited to the wrong evidence item | 155 | 100% |
+| invented transaction id | 28 | 100% |
+| currency swapped | 28 | 100% |
+| date shifted | 28 | 100% |
+| rule id swapped | 15 | 100% |
+| **number changed** | 120 | **97.5%** (117/120) |
+
+The 3 misses: two are the same change to only the sub-second part of a timestamp (seconds are not checked; documented), and one is a coincidence: "8 earlier transactions" became "10", and 10 occurs in the field name
+`transactions_in_prior_10_min`, which the validator now (deliberately) indexes. That last miss is a direct cost of the field-name fix described below. **This is a correctness check**: the same author wrote the validator, the templates and the
+perturbations, so it does not measure performance on free-form model text.
+
+### Part B: real model outputs (28 cases, 62 claims)
+| | before format fixes | after |
+|---|---|---|
+| supported | 17 | 20 |
+| **unsupported** | 14 | **11** |
+| unverifiable (nothing machine-checkable) | 31 | 31 |
+| outputs passing all checks (`validated`) | 8/28 | 10/28 |
+| advisory decision raised by the guardrail | 7 cases | 6 cases |
+| **problem cases (8 reconciliation + 4 injected pairs) still CLEAR after the guardrail** | **0 of 12** (model alone: 4 CLEAR) | 0 of 12 |
+
+**Manual audit of the unsupported flags** (each claim read against its evidence): before the fixes, **11 of 14 flags were correct**. The correct ones were: rule shorthand cited instead of the real evidence id (`E:REC-003` vs `REC-TXN-...-REC-003`),
+true values cited to the wrong evidence item, uncited speculation ("indicates potential fraud risk"), and one **fabricated number** (the model wrote "$20,403.49 matches the typical prior transactions" when the evidence says 204,034.92 INR
+at 17x the customer's typical amount). The **3 false alarms** had one root cause type, formatting the validator did not understand: dates written in prose ("April 23, 2025") and a number taken from a field name ("prior 24 hours").
+Fixing them (prose dates, `H:MM AM/PM`, field-name numbers) is a post-hoc change made after seeing these examples, so **the after-fix audit is not an independent test**: all 11 remaining flags were correct on the same sample.
+
+### What the data supports
+1. **The validator does what it claims on structured perturbations**, with no false alarms on claims that are supported by construction.
+2. **On real output it finds real problems**: 11 unsupported claims in 62, including a fabricated figure with a wrong conclusion. Roughly 3 in 4 unsupported flags were mis-citations or missing citations rather than invented facts.
+3. **Half of the model's claims (31 of 62) cannot be machine-verified** (qualitative statements such as "unusual" or "looks normal"). The guardrail cannot certify these; it reports them separately. Only 10 of 28 outputs pass all checks.
+4. **The policy floor is what stops unsafe CLEARs**, not the claim checker: the model alone marked 4 of 12 problem cases CLEAR (including 3 of 4 injected-instruction pairs); after the guardrail 0 of 12 were CLEAR. In 2 of the 4 the floor came from the reconciliation
+   finding; the evidence tripwire (the injected memo) independently forced REVIEW in all 4 injected pairs.
+5. **Cost:** the guardrail also raised some clean cases from CLEAR to REVIEW (clean: 7 CLEAR from the model, 6 after), i.e. extra reviewer work. On real model output the guardrail is conservative.
+6. **RQ4 (partial):** the guardrails *detect and quarantine* unsupported claims and prevent unsafe advice; they do not make the model produce fewer unsupported claims. The scaled with/without comparison is Phase 13.
+
+### Threats to validity
+- 28 cases / 62 claims / one model / one prompt; the manual audit was done by the author of the validator and only covers the flagged (unsupported) claims, not a sample of the 31 unverifiable or 20 supported ones, so **recall of the validator on real
+  free-form text is unmeasured** (an unsupported claim could be labelled supported).
+- Behavioural cases in EXP-LLM-01 had no anomaly-model verdict, so no engine floor applied to them there (see EXP-AGENTS-02 for the workflow, which has it).
+- The tripwire uses a regex heuristic; a rephrased injection evades it (the engine floor still protects real problems).
+
+## EXP-AGENTS-02: the workflow with guardrails on, and a correction to EXP-AGENTS-01
+
+- Same 6 held-out cases, same real components; artifact `evaluation/reports/agents/workflow_demo_qwen.json` (previous run kept as `workflow_demo_qwen_no_guardrails.json`).
+- All 6 reached HUMAN_REVIEW; the review (guardrail) step costs about **4 ms** per case; the LLM call is 98.9% of the latency. The model's proposals were identical to the earlier run (REVIEW x4, CLEAR x2), so
+  **the guardrails changed no decision here**. What they did: 4 problem cases passed all checks; the 2 clean cases stayed CLEAR but were flagged `CLEAR_WITHOUT_SUPPORTED_EVIDENCE` and **not validated** (0 verified claims, 3 unverifiable),
+  i.e. the system refuses to certify a CLEAR it cannot back with evidence. Decision *changes* were demonstrated on the stored outputs (Part B above) and in the mock-based workflow tests.
+- **Correction to EXP-AGENTS-01.** That entry attributed the 9 s gap between the multi-agent (40.3 s) and single-agent (31.0 s) variants to the richer multi-agent prompt. In this second run the order **reversed** (multi-agent 26.6 s, single-agent 27.9 s), and both
+  variants were faster than before. Latency of this small model on this machine varies by tens of percent between runs, so **that explanation was not supported and should be disregarded**; what does replicate is that non-LLM work costs well under a second per case
+  and the LLM call is about 99% of the time.

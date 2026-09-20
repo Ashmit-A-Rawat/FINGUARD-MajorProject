@@ -1,6 +1,6 @@
 PY := PYTHONPATH=. .venv/bin/python
 
-.PHONY: install test lint typecheck run data pipeline kyc-benchmark anomaly-benchmark reconciliation-eval rag-benchmark hardware llm-check agents-demo
+.PHONY: install test lint typecheck run data pipeline kyc-benchmark anomaly-benchmark reconciliation-eval rag-benchmark hardware llm-check agents-demo guardrail-eval
 install:
 	$(PY) -m pip install -e ".[dev]"
 test:
@@ -30,3 +30,5 @@ llm-check:
 	$(PY) experiments/llm/run_structured_output_check.py --provider qwen --model llm/models/qwen2.5-1.5b-instruct
 agents-demo:
 	$(PY) experiments/agents/run_workflow_demo.py --provider qwen --model llm/models/qwen2.5-1.5b-instruct
+guardrail-eval:
+	$(PY) experiments/guardrails/run_guardrail_eval.py

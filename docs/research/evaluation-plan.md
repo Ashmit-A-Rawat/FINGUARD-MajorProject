@@ -80,6 +80,18 @@ Gold = (document, section); any listed gold section counts as a hit.
 95% CIs resample questions (n=43). Limits: one author wrote documents and questions, so vocabulary overlap may flatter lexical
 retrieval; n is small; the 7 unanswerable questions make the abstention result fragile.
 
-## LLM grounding, agents, guardrails
+## Guardrails (Phase 10; implemented; supports RQ4)
 
-Defined in Phases 8 onwards (RQ3, RQ4 need the LLM).
+Runner: `experiments/guardrails/run_guardrail_eval.py` (`make guardrail-eval`, needs the saved EXP-LLM-01 report).
+
+- **Part A, claim-perturbation benchmark (ground truth by construction).** Claims are derived by template from real case evidence (so they are supported), then corrupted: number changed, invented id, swapped currency,
+  swapped rule id, shifted date, wrong citation, no citation, unknown evidence id. Metrics: false-alarm rate on the supported claims and detection rate per perturbation type. It checks that the implementation
+  does what it says; the author wrote both the templates and the perturbations, so it does **not** measure performance on free-form model text.
+- **Part B, the guardrails on real model outputs.** Claim verdict counts (supported / unsupported / unverifiable), validated share, how often the advisory decision is raised, and problem cases still CLEAR after the guardrail.
+  The unsupported flags were **audited by hand** (each read against its evidence) to estimate precision.
+- RQ4 ("does self-critique reduce unsupported claims?") is only partly answerable here: the guardrails *detect and quarantine* unsupported claims (and raise the advisory decision); they do not make the model generate fewer of
+  them. The with/without comparison at scale belongs to Phase 13.
+
+## LLM grounding, fine-tuning, full ablations
+
+Defined in Phases 12-13.

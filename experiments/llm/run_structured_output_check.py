@@ -47,19 +47,43 @@ def _pick(rng: np.random.Generator, items: list[str], n: int) -> list[str]:
     return [items[i] for i in rng.permutation(len(items))[:n]]
 
 
+class World:
+    """Loaded dataset objects needed to build case evidence."""
+
+    def __init__(self, data_dir: Path) -> None:
+        result = run_pipeline(data_dir)
+        self.store = result.store
+        self.txs = {
+            t.transaction_id: t for v in self.store.transactions_by_customer.values() for t in v
+        }
+        as_of = max(t.timestamp for t in self.txs.values())
+        self.recon = {
+            r.transaction_id: r
+            for r in ReconciliationService().reconcile_many(
+                self.txs.values(), self.store.ledger_by_transaction, as_of
+            )
+        }
+
+
+def make_case(world: World, category: str, tid: str, memo: str | None = None) -> dict[str, Any]:
+    """Evidence for one transaction (deterministic; ``memo`` is the injectable free-text field)."""
+    tx = world.txs[tid]
+    customer = world.store.customers[tx.customer_id].customer
+    history = world.store.transactions_by_customer[tx.customer_id]
+    evidence = [
+        transaction_evidence(tx, NOW, memo),
+        customer_evidence(customer, NOW),
+        behaviour_evidence(tx, history, NOW),
+        *reconciliation_evidence(world.recon[tid], NOW),
+    ]
+    return {"case_id": f"{category}-{tid}", "category": category, "evidence": evidence}
+
+
 def build_cases(data_dir: Path, seed: int) -> list[dict[str, Any]]:
     import pandas as pd
 
-    result = run_pipeline(data_dir)
-    store = result.store
-    txs = {t.transaction_id: t for v in store.transactions_by_customer.values() for t in v}
-    as_of = max(t.timestamp for t in txs.values())
-    recon = {
-        r.transaction_id: r
-        for r in ReconciliationService().reconcile_many(
-            txs.values(), store.ledger_by_transaction, as_of
-        )
-    }
+    world = World(data_dir)
+    store, txs, recon = world.store, world.txs, world.recon
     ledger_labels = pd.read_csv(data_dir / "ledger_labels.csv", keep_default_na=False)
     tx_labels = pd.read_csv(data_dir / "transaction_labels.csv", keep_default_na=False)
     rng = np.random.default_rng(seed)
@@ -67,16 +91,7 @@ def build_cases(data_dir: Path, seed: int) -> list[dict[str, Any]]:
     cases: list[dict[str, Any]] = []
 
     def add(category: str, tid: str, memo: str | None = None) -> None:
-        tx = txs[tid]
-        customer = store.customers[tx.customer_id].customer
-        history = store.transactions_by_customer[tx.customer_id]
-        evidence = [
-            transaction_evidence(tx, NOW, memo),
-            customer_evidence(customer, NOW),
-            behaviour_evidence(tx, history, NOW),
-            *reconciliation_evidence(recon[tid], NOW),
-        ]
-        cases.append({"case_id": f"{category}-{tid}", "category": category, "evidence": evidence})
+        cases.append(make_case(world, category, tid, memo))
 
     kinds = sorted(set(ledger_labels["discrepancy_type"]))
     for i in range(8):

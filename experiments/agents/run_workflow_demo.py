@@ -75,6 +75,12 @@ def run(provider_name: str, model: str, data_dir: Path, seed: int, out_dir: Path
                     if state.report and state.report.proposed_decision
                     else None,
                     "warnings": len(state.report.warnings) if state.report else None,
+                    "advisory_decision": state.report.advisory_decision.value
+                    if state.report and state.report.advisory_decision
+                    else None,
+                    "claim_summary": state.report.claim_summary if state.report else None,
+                    "validated": state.report.validated if state.report else None,
+                    "policy_flags": state.report.policy_flags if state.report else None,
                     "engine_facts": len(state.report.engine_facts) if state.report else None,
                     "attempts": state.investigation_meta.attempts
                     if state.investigation_meta

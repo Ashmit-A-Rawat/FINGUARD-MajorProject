@@ -1,0 +1,200 @@
+{
+  "notice": "SYNTHETIC; functional demo + latency breakdown, not an accuracy evaluation (n=6).",
+  "provider": "qwen",
+  "model": "llm/models/qwen2.5-1.5b-instruct",
+  "is_mock": false,
+  "setup_seconds_once": 13.933524207997834,
+  "n_cases": 6,
+  "mean_step_seconds_multi_agent": {
+    "prepare_data": 0.008176923836193358,
+    "analyze_kyc": 0.23514642333611846,
+    "analyze_anomalies": 0.02425515267047255,
+    "reconcile": 0.0031600208361245072,
+    "retrieve_knowledge": 0.04996767366537824,
+    "investigate": 39.95223251416852,
+    "review": 0.0011247846656866993,
+    "generate_report": 0.004885250004008412
+  },
+  "llm_share_of_multi_agent_latency": 0.9918886604738094,
+  "mean_wall_s": {
+    "multi_agent": 40.30673886783188,
+    "single_agent": 30.994616791659308
+  },
+  "all_reached_human_review": true,
+  "cases": [
+    {
+      "case": "reconciliation-TXN-00012058",
+      "category": "reconciliation",
+      "multi_agent": {
+        "status": "human_review",
+        "failed_step": null,
+        "proposed_decision": "REVIEW",
+        "warnings": 1,
+        "engine_facts": 3,
+        "attempts": 1,
+        "wall_s": 65.69482849998167,
+        "step_seconds": {
+          "prepare_data": 0.0001029590202961117,
+          "analyze_kyc": 0.008395375014515594,
+          "analyze_anomalies": 0.0017372079892084002,
+          "reconcile": 0.0001297919952776283,
+          "retrieve_knowledge": 0.02115591600886546,
+          "investigate": 65.63543399999617,
+          "review": 0.0022004579950589687,
+          "generate_report": 0.012443084007827565
+        }
+      },
+      "single_agent": {
+        "proposed_decision": "CLEAR",
+        "valid": true,
+        "attempts": 1,
+        "wall_s": 24.56180991700967
+      }
+    },
+    {
+      "case": "reconciliation-TXN-00019635",
+      "category": "reconciliation",
+      "multi_agent": {
+        "status": "human_review",
+        "failed_step": null,
+        "proposed_decision": "REVIEW",
+        "warnings": 1,
+        "engine_facts": 3,
+        "attempts": 1,
+        "wall_s": 27.246359749988187,
+        "step_seconds": {
+          "prepare_data": 0.028623499994864687,
+          "analyze_kyc": 0.35291470799711533,
+          "analyze_anomalies": 0.034345958003541455,
+          "reconcile": 0.007960540999192744,
+          "retrieve_knowledge": 0.061363874992821366,
+          "investigate": 26.70983904201421,
+          "review": 0.00016833300469443202,
+          "generate_report": 0.0014423750108107924
+        }
+      },
+      "single_agent": {
+        "proposed_decision": "REVIEW",
+        "valid": true,
+        "attempts": 1,
+        "wall_s": 22.984960250003496
+      }
+    },
+    {
+      "case": "behavioural-TXN-00017285",
+      "category": "behavioural",
+      "multi_agent": {
+        "status": "human_review",
+        "failed_step": null,
+        "proposed_decision": "REVIEW",
+        "warnings": 1,
+        "engine_facts": 3,
+        "attempts": 1,
+        "wall_s": 32.95696179100196,
+        "step_seconds": {
+          "prepare_data": 0.005744958994910121,
+          "analyze_kyc": 0.11682879101135768,
+          "analyze_anomalies": 0.014112875011051074,
+          "reconcile": 0.004455958987819031,
+          "retrieve_knowledge": 0.026956334011629224,
+          "investigate": 32.7650058339932,
+          "review": 0.00010637499508447945,
+          "generate_report": 0.0011251659889239818
+        }
+      },
+      "single_agent": {
+        "proposed_decision": "REVIEW",
+        "valid": true,
+        "attempts": 1,
+        "wall_s": 29.151880708988756
+      }
+    },
+    {
+      "case": "behavioural-TXN-00017283",
+      "category": "behavioural",
+      "multi_agent": {
+        "status": "human_review",
+        "failed_step": null,
+        "proposed_decision": "REVIEW",
+        "warnings": 1,
+        "engine_facts": 3,
+        "attempts": 1,
+        "wall_s": 33.588623832998564,
+        "step_seconds": {
+          "prepare_data": 0.0012192919966764748,
+          "analyze_kyc": 0.2704725000075996,
+          "analyze_anomalies": 0.03012025001225993,
+          "reconcile": 0.0007683750009164214,
+          "retrieve_knowledge": 0.07522774999961257,
+          "investigate": 33.199298833991634,
+          "review": 9.112499537877738e-05,
+          "generate_report": 0.0007822499901521951
+        }
+      },
+      "single_agent": {
+        "proposed_decision": "REVIEW",
+        "valid": true,
+        "attempts": 1,
+        "wall_s": 24.3511975829897
+      }
+    },
+    {
+      "case": "clean-TXN-00016926",
+      "category": "clean",
+      "multi_agent": {
+        "status": "human_review",
+        "failed_step": null,
+        "proposed_decision": "CLEAR",
+        "warnings": 1,
+        "engine_facts": 3,
+        "attempts": 1,
+        "wall_s": 33.09524641701137,
+        "step_seconds": {
+          "prepare_data": 0.00612875001388602,
+          "analyze_kyc": 0.2895942909817677,
+          "analyze_anomalies": 0.029351000004680827,
+          "reconcile": 0.002979208016768098,
+          "retrieve_knowledge": 0.052508541994029656,
+          "investigate": 32.69181925000157,
+          "review": 0.0001464580127503723,
+          "generate_report": 0.0009293750044889748
+        }
+      },
+      "single_agent": {
+        "proposed_decision": "REVIEW",
+        "valid": true,
+        "attempts": 1,
+        "wall_s": 29.784010999981547
+      }
+    },
+    {
+      "case": "clean-TXN-00016576",
+      "category": "clean",
+      "multi_agent": {
+        "status": "human_review",
+        "failed_step": null,
+        "proposed_decision": "CLEAR",
+        "warnings": 1,
+        "engine_facts": 3,
+        "attempts": 1,
+        "wall_s": 49.25841291600955,
+        "step_seconds": {
+          "prepare_data": 0.007242082996526733,
+          "analyze_kyc": 0.37267287500435486,
+          "analyze_anomalies": 0.03586362500209361,
+          "reconcile": 0.0026662500167731196,
+          "retrieve_knowledge": 0.06259362498531118,
+          "investigate": 48.71199812501436,
+          "review": 0.004035958991153166,
+          "generate_report": 0.012589250021846965
+        }
+      },
+      "single_agent": {
+        "proposed_decision": "REVIEW",
+        "valid": true,
+        "attempts": 2,
+        "wall_s": 55.13384129098267
+      }
+    }
+  ]
+}

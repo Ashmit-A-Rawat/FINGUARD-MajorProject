@@ -35,6 +35,7 @@ from agents.reviewer.agent import ReviewerAgent
 from agents.state import CaseState, SignOff
 from backend.app.schemas.domain import CaseStatus, Decision
 from data_pipeline.consolidation.models import CanonicalCase
+from guardrails.self_critique import SelfCritique
 
 logger = logging.getLogger("fin_guard.workflow")
 Details = dict[str, object]
@@ -59,7 +60,9 @@ class CaseWorkflow:
         self._auditor = AuditorAgent(ctx)
         self._reconciliation = ReconciliationAgent(ctx)
         self._investigator = InvestigationAgent(ctx)
-        self._reviewer = reviewer or ReviewerAgent()
+        self._reviewer = reviewer or ReviewerAgent(
+            critique=SelfCritique()
+        )  # guardrails on by default
         self._reporter = ReportAgent()
         S = CaseStatus
         self.steps: tuple[Step, ...] = (
@@ -242,10 +245,20 @@ class CaseWorkflow:
 
     def _review(self, state: CaseState, now: datetime) -> Details:
         out = self._reviewer.review(
-            ReviewInput(evidence=state.evidence, investigation=state.investigation)
+            ReviewInput(
+                evidence=state.evidence,
+                investigation=state.investigation,
+                knowledge_chunks=state.knowledge_chunks,
+            )
         )
         state.review = out
-        return {"validated": out.validated, "checks": len(out.checks)}
+        details: Details = {"validated": out.validated, "checks": len(out.checks)}
+        if out.critique is not None:
+            details.update(out.critique.counts)
+            details["guardrail_decision"] = (
+                out.critique.guardrail_decision.value if out.critique.guardrail_decision else None
+            )
+        return details
 
     def _report(self, state: CaseState, now: datetime) -> Details:
         state.report = self._reporter.generate(self._report_input(state, now))

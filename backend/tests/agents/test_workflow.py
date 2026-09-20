@@ -133,7 +133,8 @@ def test_repair_loop_is_used_and_recorded(ctx: AgentContext, busy_customer: str)
 def test_consistency_warning_when_a_model_says_clear_against_engine_findings(
     ctx: AgentContext, busy_customer: str
 ) -> None:
-    wf = CaseWorkflow(with_llm(ctx, MockLLMProvider("obey_injection")))
+    # no guardrails here: this exercises the report's basic consistency warning
+    wf = CaseWorkflow(with_llm(ctx, MockLLMProvider("obey_injection")), ReviewerAgent())
     # pick a transaction with a high-severity reconciliation finding
     store = ctx.store
     target = next(
@@ -243,13 +244,14 @@ def test_reviewer_reports_unvalidated_until_validators_exist_and_pass(
             return [CheckResult(check_id=self.check_id, passed=self.ok, detail="x")]
 
     wf = CaseWorkflow(ctx)
-    plain = wf.run(wf.create_case(busy_customer))
+    plain = CaseWorkflow(ctx, ReviewerAgent()).run(wf.create_case(busy_customer))
     assert plain.review is not None and not plain.review.validated and not plain.review.checks
     for ok in (True, False):
         wf2 = CaseWorkflow(ctx, ReviewerAgent([Always(ok)]))
         state = wf2.run(wf2.create_case(busy_customer))
         assert state.review is not None and state.review.validated is ok
-        assert (state.report is not None and state.report.validated) is ok
+        # mock output is never reported as validated, whatever the checks say
+        assert state.report is not None and state.report.validated is False
 
 
 # ---------------- services and baseline ----------------
@@ -294,3 +296,75 @@ def test_single_agent_baseline_uses_one_llm_call_and_no_workflow(
     result = SingleAgentBaseline(with_llm(ctx, provider)).run(busy_customer)
     assert provider.calls == 1 and result.investigation is not None and result.meta.is_mock
     assert result.meta.attempts == 1 and result.wall_seconds >= 0
+
+
+# ---------------- guardrails inside the workflow ----------------
+def test_default_workflow_runs_the_guardrails_and_annotates_the_report(
+    ctx: AgentContext, busy_customer: str
+) -> None:
+    state = CaseWorkflow(ctx).run(CaseWorkflow(ctx).create_case(busy_customer))
+    assert state.review is not None and state.review.critique is not None
+    report = state.report
+    assert report is not None and report.provenance["guardrails"] == "self_critique+policy_floor"
+    assert report.claim_summary["supported"] >= 1
+    assert all(
+        item.support == "supported" for item in report.model_findings
+    )  # mock cites real evidence
+    assert report.validated is False  # ... but mock output is never reported as validated
+    review_event = next(e for e in state.audit_trail if e.action == "review")
+    assert review_event.details["supported"] == report.claim_summary["supported"]
+
+
+def test_guardrails_can_be_switched_off_for_the_ablation(
+    ctx: AgentContext, busy_customer: str
+) -> None:
+    wf = CaseWorkflow(ctx, ReviewerAgent())
+    report = wf.run(wf.create_case(busy_customer)).report
+    assert report is not None and report.provenance["guardrails"] == "none"
+    assert report.claim_summary == {} and all(i.support is None for i in report.model_findings)
+
+
+def test_obedient_model_is_overruled_by_the_engine_floor_in_the_full_workflow(
+    ctx: AgentContext, busy_customer: str
+) -> None:
+    """A model that says CLEAR must not be able to end a case below what the engines found."""
+    provider = MockLLMProvider("obey_injection")
+    guarded = CaseWorkflow(with_llm(ctx, provider))
+    unguarded = CaseWorkflow(with_llm(ctx, provider), ReviewerAgent())
+    store, found = ctx.store, None
+    for t in store.transactions_by_customer[busy_customer]:
+        state = guarded.run(guarded.create_case(busy_customer, [t.transaction_id]))
+        if (
+            state.review
+            and state.review.critique
+            and state.review.critique.policy.floor is not None
+        ):
+            found = t.transaction_id
+            break
+    if found is None:
+        pytest.skip("no transaction with an engine finding for this customer in the sample")
+    raw = unguarded.run(unguarded.create_case(busy_customer, [found])).report
+    safe = state.report
+    assert raw is not None and raw.advisory_decision == Decision.CLEAR  # model unchecked
+    assert (
+        safe is not None and safe.proposed_decision == Decision.CLEAR
+    )  # the model still said CLEAR
+    assert safe.advisory_decision in (
+        Decision.REVIEW,
+        Decision.ESCALATE,
+    )  # but the advice is not CLEAR
+    assert safe.decision_adjustments and "CLEAR_BELOW_ENGINE_FLOOR" in safe.policy_flags
+    assert any("raised from CLEAR" in w for w in safe.warnings)
+
+
+def test_invalid_llm_output_still_gets_an_engine_based_advisory(
+    ctx: AgentContext, busy_customer: str
+) -> None:
+    wf = CaseWorkflow(with_llm(ctx, MockLLMProvider("wrong_schema")))
+    state = wf.run(wf.create_case(busy_customer))
+    assert state.report is not None and state.report.proposed_decision is None
+    critique = state.review.critique if state.review else None
+    assert critique is not None and critique.model_decision is None
+    assert (
+        state.report.advisory_decision == critique.policy.floor
+    )  # REVIEW if engines found something, else None

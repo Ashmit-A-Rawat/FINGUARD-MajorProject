@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 
 from backend.app.schemas.domain import Decision, Evidence, ReconciliationResult
 from data_pipeline.consolidation.models import CanonicalCase
+from guardrails.models import CritiqueReport, SupportStatus
 from knowledge_base.models import RetrievedChunk
 from llm.schemas import InvestigationOutput
 
@@ -113,12 +114,14 @@ class CheckResult(BaseModel):
 class ReviewInput(BaseModel):
     evidence: list[Evidence]
     investigation: InvestigationOutput | None
+    knowledge_chunks: list[RetrievedChunk] = Field(default_factory=list)
 
 
 class ReviewOutput(BaseModel):
     validated: bool  # False until real validators exist and have run
     checks: list[CheckResult] = Field(default_factory=list)
     notes: list[str] = Field(default_factory=list)
+    critique: CritiqueReport | None = None  # per-claim verdicts, policy flags, guardrail decision
 
 
 # ---- Report ---------------------------------------------------------------------------------
@@ -126,6 +129,8 @@ class ReportItem(BaseModel):
     text: str
     evidence_ids: list[str] = Field(default_factory=list)
     origin: Literal["engine", "model"]  # deterministic engine output vs model-generated text
+    support: SupportStatus | None = None  # verdict of the evidence validator (model items only)
+    support_reason: str | None = None
 
 
 class CaseReport(BaseModel):
@@ -137,6 +142,10 @@ class CaseReport(BaseModel):
     is_synthetic: Literal[True] = True
     proposed_decision: Decision | None  # the MODEL's proposal; a human decides
     proposed_decision_note: str
+    advisory_decision: Decision | None = None  # never lower than the engine floor
+    decision_adjustments: list[str] = Field(default_factory=list)
+    claim_summary: dict[str, int] = Field(default_factory=dict)
+    policy_flags: list[str] = Field(default_factory=list)
     validated: bool
     engine_facts: list[ReportItem]  # deterministic engine outputs
     model_findings: list[ReportItem]  # unvalidated model statements
