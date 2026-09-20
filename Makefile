@@ -1,6 +1,6 @@
 PY := PYTHONPATH=. .venv/bin/python
 
-.PHONY: install test lint typecheck run data pipeline kyc-benchmark anomaly-benchmark reconciliation-eval rag-benchmark
+.PHONY: install test lint typecheck run data pipeline kyc-benchmark anomaly-benchmark reconciliation-eval rag-benchmark hardware
 install:
 	$(PY) -m pip install -e ".[dev]"
 test:
@@ -8,7 +8,7 @@ test:
 lint:
 	$(PY) -m ruff check .
 typecheck:
-	$(PY) -m mypy backend data_pipeline scripts kyc evaluation experiments anomaly_detection reconciliation knowledge_base
+	$(PY) -m mypy backend data_pipeline scripts kyc evaluation experiments anomaly_detection reconciliation knowledge_base llm guardrails
 pipeline:
 	$(PY) scripts/run_pipeline.py --preset small
 data:
@@ -24,3 +24,5 @@ reconciliation-eval:
 	$(PY) experiments/reconciliation/run_reconciliation_eval.py --preset medium
 rag-benchmark:
 	$(PY) experiments/rag/run_retrieval_benchmark.py
+hardware:
+	$(PY) scripts/assess_hardware.py

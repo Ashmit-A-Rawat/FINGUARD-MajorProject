@@ -14,6 +14,10 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:5173"
     data_dir: str = "./data"
     synthetic_seed: int = 42
+    llm_provider: str = "mock"  # mock | qwen | mistral
+    llm_model: str = ""  # empty = the provider's default model
+    llm_device: str = "auto"  # auto | cpu | mps | cuda
+    llm_allow_download: bool = False  # never download model weights unless explicitly enabled
 
 
 @lru_cache
