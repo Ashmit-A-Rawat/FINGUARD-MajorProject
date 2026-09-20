@@ -4,7 +4,7 @@ Short record of what is built, what was measured, and what is still open. All da
 Detail lives in `docs/research/experiments.md` (results) and `docs/architecture/` (design).
 Updated at the end of every phase.
 
-**Status: 11 of 14 phases done; phase 12 (fine-tuning) in progress.**
+**Status: all 14 phases built. One step is left for a GPU machine: training the adapter and running the fine-tuned arms (RQ6).**
 
 | # | Phase | State |
 |---|-------|-------|
@@ -19,9 +19,9 @@ Updated at the end of every phase.
 | 9 | Multi-agent workflow (auditor, reconciliation, investigator, reviewer, reporter) | done |
 | 10 | Guardrails (evidence validator, engine policy floor, self-critique) | done |
 | 11 | API, React UI, human review, hash-chained audit trail | done |
-| 12 | LoRA fine-tuning of Qwen2.5-0.5B | in progress |
-| 13 | Evaluation and ablations (RQ3-RQ6, repeated runs, CIs) | todo |
-| 14 | Deployment, Docker, final docs | todo |
+| 12 | LoRA fine-tuning of Qwen2.5-0.5B | code, data and eval built; training pending (GPU PC) |
+| 13 | Evaluation and ablations (RQ3-RQ6, CIs) | done except the fine-tuned arms |
+| 14 | Deployment, Docker, CI, final docs | written; images not built here (no Docker daemon) |
 
 ## Design rules that hold everywhere
 - Deterministic engines produce the evidence; the LLM is advisory and untrusted.
@@ -42,6 +42,14 @@ Updated at the end of every phase.
 - Training does not fit on the 8 GB laptop (~2,000-token sequences run MPS out of memory), so it will run on a GPU PC: see `docs/architecture/finetune-on-gpu-pc.md`.
 - Still to do (on the PC): train, run the eval, bring back the report/adapter, write up EXP-FT-01.
 
+## Phases 13-14 in short
+- EXP-ABL-01 engine-floor ablation: reconciliation and anomaly engines cover different problem families; about a third of behavioural problems reach no engine flag (main residual risk).
+- EXP-ADV-01 memo-injection sweep: floor never lowered by any memo; the tripwire caught only 8 of 21 attack wordings (not tuned, documented).
+- EXP-LLM-02 (0.5B and 1.5B, 24 held-out cases): RAG did not measurably improve grounding (already at ceiling); the engine floor is the guardrail layer that helps; the unsupported-claim rule added nothing on this data; injection results inconclusive.
+- EXP-ORCH-01 (RQ5): multi-agent gave valid output more often (18/24 vs 13/24, inconclusive); latency direction flipped versus the earlier demo, so no latency claim.
+- RQ1/RQ2 re-run on two seeds each; `docs/research/results-summary.md` is generated from the reports.
+- Deployment: Dockerfile, frontend Dockerfile + nginx (CSP), compose (Postgres, API, web), CI workflow, reproduction guide, CITATION.cff.
+
 ## Corrections made along the way
 - EXP-AGENTS-01 latency explanation retracted after it was found wrong.
 - "2 of 4 injected pairs" sentence in EXP-GUARD-01 corrected.
@@ -51,6 +59,7 @@ Updated at the end of every phase.
 - QLoRA is not possible on macOS, so LoRA on a bf16 base is used instead.
 - Small models (0.5B / 1.5B) are weak reasoners; the guardrails, not the model, provide safety.
 - Injection tripwire is a heuristic; a rephrased attack can bypass it, and the engine floor is the real protection.
+- Docker images have not been built or run by the author (no daemon on the dev laptop); compose syntax is validated only.
 - Small evaluation sets (24 cases); results need bootstrap CIs and are not evidence of real-world performance.
 
 ## Housekeeping

@@ -6,7 +6,7 @@ All data is SYNTHETIC and seeded. Numbers vary slightly by library version and C
 python3.11 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev,api,data,ml,kyc,rag,llm]"        # torch: pick the wheel for your machine
 export OMP_NUM_THREADS=1                                # required on macOS (two OpenMP runtimes)
-make test lint typecheck                                # 385 backend tests, ruff, mypy
+make test lint typecheck                                # 388 backend tests, ruff, mypy
 ```
 
 | Result | Command | Approx. time | Report |
