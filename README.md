@@ -6,7 +6,7 @@ An on-premise multi-agent AI system for automated KYC verification and financial
 
 ## Status
 
-Phases 1-8 complete: skeleton, schemas + synthetic data generator, data pipeline, KYC entity resolution, transaction anomaly detection, rule-based reconciliation, knowledge base with retrieval, and the LLM layer (provider abstraction, mock, local Qwen/Mistral, validated structured output). Agents, guardrails and the UI are not built yet. Real local inference needs a deliberate model download (see docs/architecture/llm-architecture.md).
+Phases 1-9 complete: skeleton, data, pipeline, KYC, anomaly detection, reconciliation, knowledge base, LLM layer, and the multi-agent workflow (state machine, five agents, audit trail, human sign-off). Evidence validation/guardrails, the UI, fine-tuning and the full evaluation are not built yet. Real local inference needs a deliberate model download (see docs/architecture/llm-architecture.md).
 
 ## Architecture
 
@@ -37,6 +37,7 @@ cp .env.example .env
 | Reconciliation eval | `make reconciliation-eval` |
 | Anomaly benchmark | `make anomaly-benchmark` (report in `evaluation/reports/anomaly/`); progress: `scripts/run_status.sh <log>` |
 | Frontend | *Phase 11* |
+| Multi-agent demo | `make agents-demo` (needs the local model) |
 | Local LLM | `make hardware`; fetch weights deliberately (`scripts/download_model.py` or `scripts/fetch_weights.sh`); set `LLM_PROVIDER=qwen`, `LLM_MODEL=<dir or id>`; check with `make llm-check` |
 | Evaluation | *Phase 13* |
 

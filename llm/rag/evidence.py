@@ -6,6 +6,7 @@ data-privacy policy). Ids are stable and predictable so reports can cite them.
 
 from datetime import datetime
 from statistics import median
+from typing import Any, Protocol
 
 from backend.app.schemas.domain import (
     Customer,
@@ -14,6 +15,25 @@ from backend.app.schemas.domain import (
     ReconciliationResult,
     Transaction,
 )
+
+
+class KYCDocumentFindingLike(Protocol):
+    document_id: str
+    own_record_rank: int | None
+    other_strong_candidates: list[Any]
+
+    def model_dump(self, *, mode: str = ...) -> dict[str, Any]: ...
+
+
+class AnomalyFindingLike(Protocol):
+    transaction_id: str
+    probability: float
+    threshold: float
+    flagged: bool
+    in_training_period: bool
+
+    def model_dump(self, *, mode: str = ...) -> dict[str, Any]: ...
+
 
 OUTGOING = ("transfer_out", "payment", "withdrawal")
 
@@ -130,5 +150,35 @@ def behaviour_evidence(
         source=EvidenceSource.ANOMALY,
         description="Behaviour of this transaction compared with the customer's earlier activity",
         payload=payload,
+        created_at=created_at,
+    )
+
+
+def kyc_match_evidence(finding: "KYCDocumentFindingLike", created_at: datetime) -> Evidence:
+    """Evidence for one KYC document check. Carries ids, scores and reasons, never names."""
+    return Evidence(
+        evidence_id=f"KYCM-{finding.document_id}",
+        source=EvidenceSource.KYC,
+        description=(
+            f"KYC document {finding.document_id}: own record rank {finding.own_record_rank}, "
+            f"{len(finding.other_strong_candidates)} other strong candidate(s)"
+        ),
+        payload=finding.model_dump(mode="json"),
+        created_at=created_at,
+    )
+
+
+def anomaly_model_evidence(finding: "AnomalyFindingLike", created_at: datetime) -> Evidence:
+    caveat = (
+        "; score is optimistic (inside model training period)" if finding.in_training_period else ""
+    )
+    return Evidence(
+        evidence_id=f"ANOM-{finding.transaction_id}",
+        source=EvidenceSource.ANOMALY,
+        description=(
+            f"Anomaly model score {finding.probability:.3f} vs alert threshold "
+            f"{finding.threshold:.3f}: {'FLAGGED' if finding.flagged else 'not flagged'}{caveat}"
+        ),
+        payload=finding.model_dump(mode="json"),
         created_at=created_at,
     )

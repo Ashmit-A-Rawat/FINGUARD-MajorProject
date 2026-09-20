@@ -56,3 +56,46 @@ in the original spec are impossible without a schema change. Adding them is a Ph
 signals, but the synthetic generator assigns statuses randomly (95% settled / 4% pending / 1% failed), so these
 rules fire on about 5% of ordinary rows. They can be switched off with `check_settlement_status=False`, and
 evaluation reports them separately from the core rules.
+
+
+## Multi-agent workflow (Phase 9, `agents/`)
+
+Orchestration is a deterministic state machine ([ADR 0003](../decisions/0003-explicit-state-machine-not-langgraph.md)); **no LLM decides what
+happens next.** Only one agent calls a language model, and the model is advisory and untrusted (see EXP-LLM-01).
+
+```
+CASE_CREATED -> DATA_READY -> KYC_ANALYZED -> ANOMALY_ANALYZED -> RECONCILED -> EVIDENCE_RETRIEVED
+   -> INVESTIGATION_GENERATED -> SELF_CRITIQUED -> HUMAN_REVIEW -> CLOSED   (CLOSED only by a named human)
+```
+
+| Agent | Responsibility (and nothing else) | Input -> output (`agents/contracts.py`) | LLM |
+|---|---|---|---|
+| Coordinator | order, state, audit, failure routing, human sign-off rules; builds the canonical case | (drives all) | no |
+| Auditor | KYC verification (matcher: BM25 + dense + DOB/address) and anomaly scoring (XGBoost, top score drivers) | `KYCAnalysisInput -> KYCAnalysisOutput`; `AnomalyAnalysisInput -> AnomalyAnalysisOutput` | no |
+| Reconciliation | transaction vs ledger rules for the case | `ReconciliationInput -> ReconciliationOutput` | no |
+| Investigator | targeted knowledge retrieval, then a structured advisory investigation | `RetrievalInput -> RetrievalOutput`; `InvestigationInput -> InvestigationResult` | **yes** |
+| Reviewer / critic | checks the investigation before a human sees it; plug-in `Validator`s | `ReviewInput -> ReviewOutput` | (Phase 10) |
+| Report | assembles the explainable report | `ReportInput -> CaseReport` | no |
+
+Rules that keep responsibilities from overlapping: an agent reads only its declared input and returns only its declared output; **only the
+coordinator merges outputs into `CaseState`**; evidence ids are unique per case (a clash raises); agents never touch each other's engines.
+
+**Fail-safe behaviour.** A step exception marks `failed_step`, produces a best-effort report and moves the case to HUMAN_REVIEW; an invalid LLM answer
+(after the bounded repair loop) leaves `investigation=None` and the report says so. Nothing continues silently past a failure and nothing is auto-closed.
+
+**Human sign-off (`CaseWorkflow.sign_off`).** Requires a named reviewer and a written reason; ESCALATE requires a second, *different* reviewer (four-eyes);
+only valid from HUMAN_REVIEW; every sign-off is an audit event.
+
+**Audit trail.** One `AuditEvent` per step: id, timestamp, case id, request id, actor, action, from/to status, duration, ok/error and small structured details
+(provider, mock flag, counts), which contain no names or document numbers (tested). Each event is also emitted as a JSON log line.
+
+**Report honesty.** Engine facts (deterministic) and model statements are separate lists with an `origin`. The report is marked UNVALIDATED until the
+Phase 10 validators exist, MOCK when a mock provider produced it, flags anomaly scores from inside the model's training period, lists reference text withheld as suspicious,
+and carries a **consistency warning** when the model proposes CLEAR while engines report a high-severity finding (enforcement is Phase 10).
+
+**Single-agent baseline** (`agents/baseline.py`): one function, one LLM call, one generic retrieval query, no state machine, audit or reviewer; same engines and provider.
+It exists for the RQ5 ablation in Phase 13.
+
+**Limits.** `build_context` trains the anomaly model at startup from labelled history (fine for the small dataset; a real deployment would load a persisted model). Cases must be
+from the held-out period to avoid optimistic scores (flagged when not). The KYC step matches the case's documents against the customer master with the un-reranked hybrid+structured
+system (no fitted reranker needed).

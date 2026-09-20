@@ -230,3 +230,35 @@ decisions of this small model are **not perfectly reproducible**. Anything measu
 - Evidence had no anomaly verdict. In the full system the anomaly engine's score would be evidence, which would likely change the behavioural result. Not tested here.
 - "Decision sanity" uses the generator's labels as ground truth, and one injected phrasing only.
 - This is not the grounding evaluation (whether each claim is *supported*); that needs the Phase 10 validator.
+
+## EXP-AGENTS-01: Multi-agent workflow vs single-agent baseline, latency breakdown (groundwork for RQ5)
+
+- Script: `experiments/agents/run_workflow_demo.py --provider qwen --model llm/models/qwen2.5-1.5b-instruct` (`make agents-demo`); artifact: `evaluation/reports/agents/workflow_demo_qwen.json`
+- Real components end to end: KYC matcher, XGBoost anomaly scorer (with the engine verdict in the evidence), reconciliation rules, knowledge-base retrieval, Qwen2.5-1.5B (Metal), on the small synthetic dataset.
+- 6 cases, all from **after the anomaly model's training period** (2 reconciliation problems, 2 behavioural anomalies, 2 clean). One run each of the multi-agent workflow and the single-agent baseline.
+
+| measure | result |
+|---|---|
+| cases reaching HUMAN_REVIEW with no failed step | 6/6 (none auto-closed; all report `UNVALIDATED`) |
+| valid structured output first attempt | 6/6 multi-agent, 6/6 single-agent |
+| mean wall time per case | multi-agent 40.3 s, single-agent 31.0 s |
+| share of multi-agent time in the LLM call | **99.2%** (39.95 s of 40.3 s) |
+| all non-LLM agents together | about 0.33 s (KYC matcher 0.24 s, retrieval 0.05 s, anomaly 0.02 s, rest under 0.01 s) |
+| one-off setup (index, train anomaly model, load) | 14 s |
+
+Proposed decisions (advisory, single run): multi-agent gave REVIEW, REVIEW, REVIEW, REVIEW, CLEAR, CLEAR for the two reconciliation, two behavioural and two clean cases,
+matching the generator's labels in all 6; the single-agent baseline gave CLEAR (reconciliation), REVIEW, REVIEW, REVIEW and REVIEW, REVIEW for the same cases, so 4 of 6.
+
+### What the data supports, and what it does not
+1. **Orchestration overhead is negligible in wall-clock terms**: everything except the LLM call costs about 0.3 s per case (under 1%). The LLM is essentially the whole cost.
+2. **The 9 s gap between the two variants is not orchestration.** It comes from the multi-agent prompt being richer (KYC match evidence, a reconciliation-history summary and up to 4 targeted reference chunks versus 2
+   generic ones), so the model reads and writes more. RQ5's cost is therefore "more context to the LLM", not "more agents".
+3. **The decision difference (6/6 vs 4/6) is anecdotal.** n=6, one run each, a small model whose decisions vary between runs (EXP-LLM-01), and several things differ between the variants (extra evidence, targeted retrieval), so
+   the cause cannot be attributed to orchestration. It does fit the earlier finding that the model judges better when engines state their verdict in the evidence, which this run supports only tentatively.
+   No claim about accuracy is made; that needs the Phase 13 ablation with many cases, repeated runs and confidence intervals.
+4. **Failure handling and sign-off are verified by tests, not by this run** (24 tests: state order, fail-safe routing, invalid LLM output, four-eyes escalation, audit content).
+
+### Threats to validity
+- 6 cases, one run, one model; latency measured on one machine with one thread for numeric libraries (OMP=1).
+- The workflow trains its anomaly model on labelled history at startup; cases were restricted to the held-out period, but the same synthetic generator produced train and test data.
+- Nothing here is validated (Phase 10): the "matching labels" observation is about proposals, not about whether the reasoning was supported by evidence.

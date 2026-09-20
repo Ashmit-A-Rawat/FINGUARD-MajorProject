@@ -87,7 +87,7 @@ def build_cases(data_dir: Path, seed: int) -> list[dict[str, Any]]:
         pool = tx_labels[tx_labels["anomaly_type"] == anomaly_types[i % len(anomaly_types)]]
         add("behavioural", _pick(rng, [t for t in pool["transaction_id"] if t in txs], 1)[0])
     problem = set(ledger_labels["transaction_id"]) | set(
-        tx_labels[tx_labels["is_anomaly"] == "True"]["transaction_id"]
+        tx_labels[tx_labels["is_anomaly"].astype(str).eq("True")]["transaction_id"]
     )
     clean_ids = [
         t
