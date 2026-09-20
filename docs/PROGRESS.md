@@ -32,13 +32,15 @@ Updated at the end of every phase.
 - Escalation needs a second, authenticated reviewer (four-eyes).
 - Mock outputs are always labelled mock. No result is reported that was not produced by the code.
 
-## Phase 12 so far (uncommitted work marked with *)
+## Phase 12 so far
 - Teacher targets are built from evidence only, never from ground-truth labels. Never ESCALATE, fixed uncalibrated confidence.
 - Dataset: train 242, val 22, eval 24, eval_injected 8; customer-disjoint; time-split (train model up to 2025-04-25, eval from 2025-05-29).
 - Train and eval injection wordings are disjoint (eval includes one deliberately evasive wording).
 - Trainer: LoRA r=16 on attention + MLP, loss on assistant tokens only, bf16 base, adapters git-ignored.
 - `LocalHFProvider` can load an adapter and toggle it off, so base and tuned arms share one model.
-- Still to do: run training, four-arm eval (base / RAG / tuned / tuned+RAG) with CIs, write-up.
+- Four-arm eval script `experiments/llm/run_finetune_eval.py` is built and wired (checked with mock only). Dataset is committed.
+- Training does not fit on the 8 GB laptop (~2,000-token sequences run MPS out of memory), so it will run on a GPU PC: see `docs/architecture/finetune-on-gpu-pc.md`.
+- Still to do (on the PC): train, run the eval, bring back the report/adapter, write up EXP-FT-01.
 
 ## Corrections made along the way
 - EXP-AGENTS-01 latency explanation retracted after it was found wrong.
