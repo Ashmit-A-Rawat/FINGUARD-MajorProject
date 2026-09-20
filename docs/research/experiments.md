@@ -305,8 +305,9 @@ Fixing them (prose dates, `H:MM AM/PM`, field-name numbers) is a post-hoc change
 1. **The validator does what it claims on structured perturbations**, with no false alarms on claims that are supported by construction.
 2. **On real output it finds real problems**: 11 unsupported claims in 62, including a fabricated figure with a wrong conclusion. Roughly 3 in 4 unsupported flags were mis-citations or missing citations rather than invented facts.
 3. **Half of the model's claims (31 of 62) cannot be machine-verified** (qualitative statements such as "unusual" or "looks normal"). The guardrail cannot certify these; it reports them separately. Only 10 of 28 outputs pass all checks.
-4. **The policy floor is what stops unsafe CLEARs**, not the claim checker: the model alone marked 4 of 12 problem cases CLEAR (including 3 of 4 injected-instruction pairs); after the guardrail 0 of 12 were CLEAR. In 2 of the 4 the floor came from the reconciliation
-   finding; the evidence tripwire (the injected memo) independently forced REVIEW in all 4 injected pairs.
+4. **The policy floor is what stops unsafe CLEARs**, not the claim checker: the model alone marked 4 of 12 problem cases CLEAR (including 3 of 4 injected-instruction pairs); after the guardrail 0 of 12 were CLEAR. In all 4 injected pairs the high-severity reconciliation finding alone already implies REVIEW
+   (REC-003, REC-004, REC-002, REC-008), and the evidence tripwire also flags all 4 injected memos, so either mechanism suffices on these cases: **this result does not show that the tripwire
+   was needed**. Its value would be for a case whose only problem is the manipulation attempt.
 5. **Cost:** the guardrail also raised some clean cases from CLEAR to REVIEW (clean: 7 CLEAR from the model, 6 after), i.e. extra reviewer work. On real model output the guardrail is conservative.
 6. **RQ4 (partial):** the guardrails *detect and quarantine* unsupported claims and prevent unsafe advice; they do not make the model produce fewer unsupported claims. The scaled with/without comparison is Phase 13.
 
