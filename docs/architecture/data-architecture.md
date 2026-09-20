@@ -174,3 +174,10 @@ KYC documents, focus transactions with all their ledger records, and context tra
   by unit tests that inject dirt (orphans, negative amounts, bad enums, conflicting keys, messy whitespace).
 - All tables are held in memory. Fine for small/medium presets; `large` would need a streaming or
   database-backed store (Phase 3+ database work is deferred until needed).
+
+## KYC benchmark data
+
+The KYC benchmark (`evaluation/benchmarks/kyc_benchmark.py`) reuses `generate_customers` with a
+balanced variation mix and higher duplicate/namesake rates (6% each). It is separate from the main
+dataset presets and needs no transactions. See [ml-architecture](ml-architecture.md#kyc-entity-resolution-kyc)
+and the [evaluation plan](../research/evaluation-plan.md).

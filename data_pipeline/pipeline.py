@@ -14,16 +14,11 @@ from pydantic import BaseModel
 
 from backend.app.schemas.domain import Customer, KYCRecord, LedgerRecord, Transaction
 from data_pipeline.cleaning.cleaner import clean_record
-from data_pipeline.consolidation.models import (
-    CanonicalCustomer,
-    CanonicalKYCDocument,
-)
+from data_pipeline.consolidation.canonicalize import canonicalize_customer, canonicalize_kyc
+from data_pipeline.consolidation.models import CanonicalKYCDocument
 from data_pipeline.consolidation.store import ConsolidatedStore, group_sorted
 from data_pipeline.ingestion.loader import TABLE_FILES, read_raw_table, verify_manifest
 from data_pipeline.ingestion.validator import Quarantined, validate_records
-from data_pipeline.normalization.addresses import normalize_address
-from data_pipeline.normalization.identifiers import normalize_document_number
-from data_pipeline.normalization.names import normalize_name
 
 logger = logging.getLogger(__name__)
 
@@ -93,23 +88,14 @@ def run_pipeline(input_dir: Path) -> PipelineResult:
 
     for customer in customers.values():
         try:
-            name = normalize_name(customer.name)
+            canonical = canonicalize_customer(customer)
         except ValueError as exc:
             quarantine.append(
                 _quarantine("customers", 0, "normalization_failed", str(exc), customer)
             )
             continue
-        address = normalize_address(customer.address)
-        unparsed += not address.parsed
-        alternates = []
-        for alt in customer.alternate_names:
-            try:
-                alternates.append(normalize_name(alt))
-            except ValueError:
-                logger.warning("dropping unusable alternate name for %s", customer.customer_id)
-        store.customers[customer.customer_id] = CanonicalCustomer(
-            customer=customer, name=name, alternate_names=alternates, address=address
-        )
+        unparsed += not canonical.address.parsed
+        store.customers[customer.customer_id] = canonical
 
     kyc_docs: dict[str, list[CanonicalKYCDocument]] = defaultdict(list)
     for record in accepted["kyc_records"]:
@@ -126,20 +112,14 @@ def run_pipeline(input_dir: Path) -> PipelineResult:
             )
             continue
         try:
-            doc_name = normalize_name(record.name)
-            doc_number = normalize_document_number(record.document_number)
+            document = canonicalize_kyc(record)
         except ValueError as exc:
             quarantine.append(
                 _quarantine("kyc_records", 0, "normalization_failed", str(exc), record)
             )
             continue
-        doc_address = normalize_address(record.address)
-        unparsed += not doc_address.parsed
-        kyc_docs[record.customer_id].append(
-            CanonicalKYCDocument(
-                record=record, name=doc_name, address=doc_address, document_number=doc_number
-            )
-        )
+        unparsed += not document.address.parsed
+        kyc_docs[record.customer_id].append(document)
     store.kyc_by_customer = dict(kyc_docs)
 
     transactions: list[Transaction] = []
