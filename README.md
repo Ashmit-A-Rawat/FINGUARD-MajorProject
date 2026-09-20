@@ -6,7 +6,7 @@ An on-premise multi-agent AI system for automated KYC verification and financial
 
 ## Status
 
-Phases 1-4 complete: skeleton, schemas + synthetic data generator, data pipeline, KYC entity resolution with a benchmark and ablation. Anomaly detection, RAG, LLM and agents are not built yet.
+Phases 1-5 complete: skeleton, schemas + synthetic data generator, data pipeline, KYC entity resolution, transaction anomaly detection (supervised, unsupervised, neural) with benchmarks and ablations. Reconciliation, RAG, LLM and agents are not built yet.
 
 ## Architecture
 
@@ -33,7 +33,7 @@ cp .env.example .env
 | Generate data | `make data` or `python scripts/generate_synthetic_data.py --preset small` (see [data architecture](docs/architecture/data-architecture.md)) |
 | Data pipeline | `make pipeline` |
 | KYC benchmark / ablation | `make kyc-benchmark` (report in `evaluation/reports/kyc/`) |
-| Anomaly ML | *Phase 5* |
+| Anomaly benchmark | `make anomaly-benchmark` (report in `evaluation/reports/anomaly/`); progress: `scripts/run_status.sh <log>` |
 | Frontend | *Phase 11* |
 | Local LLM | *Phase 8* |
 | Evaluation | *Phase 13* |

@@ -1,6 +1,6 @@
 # ML Architecture
 
-Status: Phase 4 (KYC) documented below. Anomaly detection (Phase 5) will be added here.
+Status: Phase 4 (KYC) and Phase 5 (anomaly detection) documented below.
 
 # KYC entity resolution (`kyc/`)
 
@@ -52,3 +52,79 @@ KYC document -> canonical identity (Phase 3 normalisation)
 - The default `match_threshold` (0.65) is a priori; the benchmark reports per-system thresholds
   learned on dev, and a deployment must re-calibrate on its own data.
 - The reranker model is not yet persisted to disk (refit each benchmark run).
+
+
+# Transaction anomaly detection (`anomaly_detection/`)
+
+**Task.** Score each transaction for how anomalous it is relative to its customer's own history
+and the population. Labels come from the synthetic generator's *behavioural* anomaly injection
+(7 types, 2% of rows). Ledger discrepancies are handled by reconciliation (Phase 6), not here.
+
+```
+ingest via Phase 3 pipeline (validated, nothing quarantined) -> causal features
+  -> chronological split 60/20/20 (+ episode purge) -> 9 models -> threshold on val -> metrics on test
+```
+
+## Leakage prevention (the part most likely to be wrong, so it is tested)
+
+1. **Causal features.** A feature of transaction *t* uses *t* and the same customer's transactions
+   strictly earlier in (timestamp, position) order. Test: recompute features on data truncated at time T; all
+   earlier rows must be identical (`test_features_are_causal_truncation_invariance`). Others check window
+   counts and history z-scores against brute-force computation on the busiest customer.
+2. **Chronological split**, never random: train < validation < test in time (asserted).
+3. **Episode purge.** Anomaly episodes (bursts, velocity runs, repeated transfers) that straddle a split
+   boundary are removed from *all* splits so an episode is never partly train and partly test. Episode ids
+   are used only to place the split, never as features.
+4. **Labels never enter features.** Labels live in a separate file and are joined only as targets.
+   Unsupervised models are tested to ignore labels (flipping all labels leaves scores unchanged).
+5. **Validation use is limited** to early stopping and choosing each model's decision threshold (F1-maximising).
+   This includes unsupervised models' thresholds (they use validation *labels* for that step only). Scalers
+   are fit on train only.
+6. **Same customers in train and test.** This simulates deployment (new transactions of known customers),
+   so it does not test generalisation to unseen customers.
+
+## Features (34 engineered; 16 "basic")
+
+*Basic* = per-transaction attributes only: log USD-equivalent amount, hour (sin/cos), night flag, direction,
+cross-border flag, type and channel one-hots. *Engineered* adds history: z-score of amount vs the customer's
+prior transactions, amount vs prior max, hour deviation from prior mean hour, log gap since previous
+transaction, log transaction counts in the prior 10 min / 1 h / 24 h / 7 d, log amount sum in 24 h,
+first-time counterparty, first-time counterparty country, prior repeats of the same amount to the same
+counterparty, prior counterparty count, log prior transaction count, account age and account type.
+History statistics are zeroed until a customer has 5 prior transactions.
+
+## Models
+
+| Model | Family | Notes |
+|---|---|---|
+| logistic_regression | supervised | scaled features, balanced class weights |
+| random_forest | supervised | 300 trees, balanced-subsample class weights |
+| xgboost | supervised | early stopping on val PR-AUC, `scale_pos_weight` |
+| xgboost_basic_features | supervised | same, basic features only: measures what history features add |
+| isolation_forest | unsupervised | fit without labels; score = -score_samples |
+| autoencoder | unsupervised | 34-64-16-8-16-64-34, fit without labels, early stop on unlabeled val loss |
+| mlp | neural | 128-64, class-balanced BCE, early stop on val PR-AUC |
+| temporal_seq | neural | **GRU over the customer's last 20 transactions**, raw attributes + categorical embeddings (type, channel, counterparty country, counterparty hash bucket) + inter-event times; no engineered history features |
+| temporal_hybrid | neural | same encoder plus the engineered features of the current transaction at the head |
+
+**Why the temporal model exists.** To test whether a sequence encoder can *learn* behaviour that otherwise needs
+hand-engineered history features. `temporal_seq` vs `xgboost_basic_features` (same information available, different
+learner) answers that; `temporal_hybrid` vs `xgboost` asks whether the encoder adds anything on top of good features.
+It is deliberately small (hidden size 64, one GRU layer).
+
+## Engineering notes (real bugs hit; do not regress)
+
+- **macOS segfault:** importing PyTorch before XGBoost crashes the process (exit 139; clashing OpenMP runtimes).
+  XGBoost is imported first in `anomaly_detection/__init__.py` and `backend/tests/conftest.py`; scripts must not
+  import torch before that package.
+- **Silent deadlock:** PyTorch's default thread pool hangs (0% CPU, no error) after XGBoost/scikit-learn have
+  used theirs. `torch.set_num_threads(1)` in `neural/common.py` fixes it and makes training deterministic.
+  Cost: neural training is single-threaded.
+
+## Limitations
+
+- Anomalies are injected with clean, known signatures, and supervised models are trained on the same anomaly
+  types they are tested on (a closed world). Real anomalies are open-ended; expect all numbers to be optimistic.
+- The generator's unusual-country set is a fixed list, so a model with country identity can learn it directly.
+- Amounts use a constant illustrative FX table, not market rates.
+- Models are trained once per run (one seed); the reranker-style seed variance is not measured beyond the two data seeds.

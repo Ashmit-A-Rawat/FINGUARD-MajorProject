@@ -34,6 +34,24 @@ structured verification from the reranker.
 
 Run: `make kyc-benchmark` (about 5 minutes on the dev machine).
 
-## Anomaly detection, LLM/RAG, agents, guardrails
+## Anomaly detection (Phase 5; implemented)
 
-Defined in Phases 5 onwards.
+Runner: `experiments/anomaly/run_anomaly_benchmark.py` (`make anomaly-benchmark`, about 3 minutes on the medium
+preset). Protocol and leakage controls: [ml-architecture](../architecture/ml-architecture.md#transaction-anomaly-detection-anomaly_detection).
+
+| Metric | Definition |
+|---|---|
+| PR-AUC | average precision (main metric; a random scorer scores about the base rate, 1.75% on test) |
+| ROC-AUC | reported but not relied on under roughly 1:56 imbalance |
+| precision / recall / F1 | at the F1-maximising threshold chosen on VALIDATION |
+| FPR / FNR | share of normal rows flagged / share of anomalies missed at that threshold |
+| P@k%, R@k% | precision and recall when flagging the top 1% / 2% of test rows by score (threshold-free) |
+| recall by anomaly type | which injected anomaly types each model catches |
+| latency | median ms per 1000 rows (batch) and per single row, single CPU process |
+
+Accuracy is deliberately not reported. 95% CIs are a **customer-clustered bootstrap** (200 resamples): rows of one
+customer, especially within an anomaly episode, are correlated, so resampling rows would understate uncertainty.
+
+## LLM/RAG, agents, guardrails
+
+Defined in Phases 7 onwards.
