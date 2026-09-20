@@ -1,6 +1,6 @@
 PY := .venv/bin/python
 
-.PHONY: install test lint typecheck run data
+.PHONY: install test lint typecheck run data pipeline
 install:
 	$(PY) -m pip install -e ".[dev]"
 test:
@@ -9,6 +9,8 @@ lint:
 	$(PY) -m ruff check .
 typecheck:
 	$(PY) -m mypy backend data_pipeline scripts
+pipeline:
+	$(PY) scripts/run_pipeline.py --preset small
 data:
 	$(PY) scripts/generate_synthetic_data.py --preset small
 run:

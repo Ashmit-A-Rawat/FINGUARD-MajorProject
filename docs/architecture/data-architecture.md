@@ -115,3 +115,62 @@ in `manifest.json`, and the CLI exits non-zero if validation fails.
 - Ledger has no independent settlement process; discrepancies are injected, not emergent.
 - Customers are independent, so no fraud rings, mule accounts or shared counterparties are modelled.
 - Ledger labels do not cover a discrepancy stacked on top of another (one label per transaction).
+
+# Phase 3: Data pipeline
+
+Code: `data_pipeline/` (`pipeline.py` orchestrates). Run with `make pipeline` or
+`python scripts/run_pipeline.py --preset small`. Output: `data/processed/<preset>/`
+(`pipeline_report.json`, `quarantine.json`, `customers_normalized.csv`, `kyc_normalized.csv`).
+
+```
+CSV files -> integrity check -> raw read (all strings) -> cleaning -> schema validation
+          -> referential checks -> normalization -> consolidated store -> canonical case
+```
+
+## Principles ("no silent data corruption")
+
+1. **Integrity first.** If `manifest.json` exists, every file's SHA-256 is checked; a mismatch raises `IntegrityError`.
+2. **Nothing disappears.** A row that fails validation is *quarantined* with `table`, `row_number`,
+   `reason`, `detail` and the full record. Reasons: `missing_primary_key`, `duplicate_key_conflict`,
+   `schema_validation_failed`, `orphan_reference`, `normalization_failed`. Byte-identical duplicate rows
+   are dropped and counted (`exact_duplicates_dropped`).
+3. **Every cleaning change is counted** per table (`trim_whitespace`, `collapse_whitespace`,
+   `unicode_nfc`, `null_token_to_none`). Cleaning never changes meaning: no case changes, no
+   accent stripping. Null tokens are whole-field only (`""`, `nan`, `null`, `none`, `n/a`); `NA`
+   is kept because it is a valid country code.
+4. **Normalization adds, never replaces.** Each canonical object embeds the raw record plus
+   normalized forms (`NormalizedName`, `NormalizedAddress`, normalized document number). The raw value
+   stays available to the KYC engine and to human reviewers.
+5. **Unparseable is flagged, not guessed.** Addresses that do not match the expected structure are
+   kept with `parsed=False` and counted in the report. A name with no usable tokens is quarantined.
+6. **The report is data.** `PipelineReport` records rows read/accepted, cleaning actions,
+   quarantine counts, unparsed addresses, and ledger facts (transactions with no / several ledger rows).
+
+## Normalization rules
+
+- **Names:** accent strip, casefold, remove `.` and punctuation (keeps `-` and `'`), collapse spaces.
+  `Last, First Middle` (comma only) becomes `first middle last` with `reordered=True`. Flags `has_initials`.
+  Token order is otherwise kept, so `Last First` without a comma is *not* guessed.
+- **Addresses:** `number street, city, CC` is parsed; street suffix standardised
+  (`Street/St.` to `st`, `Avenue/Ave` to `ave`, etc.); country upper-cased.
+- **Document numbers:** upper-case alphanumerics only.
+- **Dates and amounts:** parsed by the Pydantic schemas (ISO dates only; ambiguous `DD/MM` vs `MM/DD`
+  formats are rejected rather than guessed).
+
+## Canonical case (`CanonicalCase`)
+
+The single input object for the KYC, anomaly and reconciliation engines: customer (raw + normalized),
+KYC documents, focus transactions with all their ledger records, and context transactions.
+- Focus defaults to the customer's latest transaction. `as_of` = latest focus timestamp.
+- Context = the customer's other transactions in `[as_of - context_days, as_of]`: **no future data**.
+- **No ground-truth labels** appear anywhere in a case (tested by walking the serialised JSON).
+- Ledger records are attached as observed facts (0, 1 or many); judging discrepancies is Phase 6.
+
+## Scope notes
+
+- Entity resolution (duplicate / namesake detection) is *not* done here; it is Phase 4. Consolidation
+  here means linking records and building cases.
+- The synthetic data is already clean, so the pipeline's cleaning and quarantine paths are exercised
+  by unit tests that inject dirt (orphans, negative amounts, bad enums, conflicting keys, messy whitespace).
+- All tables are held in memory. Fine for small/medium presets; `large` would need a streaming or
+  database-backed store (Phase 3+ database work is deferred until needed).
