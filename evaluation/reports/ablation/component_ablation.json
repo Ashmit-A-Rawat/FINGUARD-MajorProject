@@ -1,0 +1,493 @@
+{
+  "note": "SYNTHETIC data. Engine-floor ablation, no LLM. 95% CIs: case bootstrap.",
+  "sets": {
+    "heldout_eval": 24,
+    "pooled_uninjected": 228
+  },
+  "results": {
+    "heldout_eval": {
+      "full (all engines, default policy)": {
+        "recall_reconciliation": {
+          "mean": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 8
+        },
+        "recall_behavioural": {
+          "mean": 0.375,
+          "lo": 0.125,
+          "hi": 0.75,
+          "n": 8
+        },
+        "false_flag_rate_clean": {
+          "mean": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 8
+        },
+        "precision": {
+          "mean": 1.0,
+          "n": 11
+        }
+      },
+      "reconciliation only": {
+        "recall_reconciliation": {
+          "mean": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 8
+        },
+        "recall_behavioural": {
+          "mean": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 8
+        },
+        "false_flag_rate_clean": {
+          "mean": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 8
+        },
+        "precision": {
+          "mean": 1.0,
+          "n": 8
+        }
+      },
+      "anomaly model only": {
+        "recall_reconciliation": {
+          "mean": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 8
+        },
+        "recall_behavioural": {
+          "mean": 0.25,
+          "lo": 0.0,
+          "hi": 0.625,
+          "n": 8
+        },
+        "false_flag_rate_clean": {
+          "mean": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 8
+        },
+        "precision": {
+          "mean": 1.0,
+          "n": 2
+        }
+      },
+      "KYC matcher only": {
+        "recall_reconciliation": {
+          "mean": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 8
+        },
+        "recall_behavioural": {
+          "mean": 0.125,
+          "lo": 0.0,
+          "hi": 0.375,
+          "n": 8
+        },
+        "false_flag_rate_clean": {
+          "mean": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 8
+        },
+        "precision": {
+          "mean": 1.0,
+          "n": 1
+        }
+      },
+      "reconciliation + anomaly": {
+        "recall_reconciliation": {
+          "mean": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 8
+        },
+        "recall_behavioural": {
+          "mean": 0.25,
+          "lo": 0.0,
+          "hi": 0.625,
+          "n": 8
+        },
+        "false_flag_rate_clean": {
+          "mean": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 8
+        },
+        "precision": {
+          "mean": 1.0,
+          "n": 10
+        }
+      },
+      "reconciliation + KYC": {
+        "recall_reconciliation": {
+          "mean": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 8
+        },
+        "recall_behavioural": {
+          "mean": 0.125,
+          "lo": 0.0,
+          "hi": 0.375,
+          "n": 8
+        },
+        "false_flag_rate_clean": {
+          "mean": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 8
+        },
+        "precision": {
+          "mean": 1.0,
+          "n": 9
+        }
+      },
+      "anomaly + KYC": {
+        "recall_reconciliation": {
+          "mean": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 8
+        },
+        "recall_behavioural": {
+          "mean": 0.375,
+          "lo": 0.125,
+          "hi": 0.75,
+          "n": 8
+        },
+        "false_flag_rate_clean": {
+          "mean": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 8
+        },
+        "precision": {
+          "mean": 1.0,
+          "n": 3
+        }
+      },
+      "full, LOW-severity findings also count": {
+        "recall_reconciliation": {
+          "mean": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 8
+        },
+        "recall_behavioural": {
+          "mean": 0.375,
+          "lo": 0.125,
+          "hi": 0.75,
+          "n": 8
+        },
+        "false_flag_rate_clean": {
+          "mean": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 8
+        },
+        "precision": {
+          "mean": 1.0,
+          "n": 11
+        }
+      },
+      "full, only HIGH-severity findings count": {
+        "recall_reconciliation": {
+          "mean": 0.625,
+          "lo": 0.25,
+          "hi": 0.875,
+          "n": 8
+        },
+        "recall_behavioural": {
+          "mean": 0.375,
+          "lo": 0.125,
+          "hi": 0.75,
+          "n": 8
+        },
+        "false_flag_rate_clean": {
+          "mean": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 8
+        },
+        "precision": {
+          "mean": 1.0,
+          "n": 8
+        }
+      },
+      "full, settlement-status rules also count": {
+        "recall_reconciliation": {
+          "mean": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 8
+        },
+        "recall_behavioural": {
+          "mean": 0.375,
+          "lo": 0.125,
+          "hi": 0.75,
+          "n": 8
+        },
+        "false_flag_rate_clean": {
+          "mean": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 8
+        },
+        "precision": {
+          "mean": 1.0,
+          "n": 11
+        }
+      }
+    },
+    "pooled_uninjected": {
+      "full (all engines, default policy)": {
+        "recall_reconciliation": {
+          "mean": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 67
+        },
+        "recall_behavioural": {
+          "mean": 0.6415094339622641,
+          "lo": 0.5094339622641509,
+          "hi": 0.7547169811320755,
+          "n": 53
+        },
+        "false_flag_rate_clean": {
+          "mean": 0.05555555555555555,
+          "lo": 0.018518518518518517,
+          "hi": 0.10185185185185185,
+          "n": 108
+        },
+        "precision": {
+          "mean": 0.9439252336448598,
+          "n": 107
+        }
+      },
+      "reconciliation only": {
+        "recall_reconciliation": {
+          "mean": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 67
+        },
+        "recall_behavioural": {
+          "mean": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 53
+        },
+        "false_flag_rate_clean": {
+          "mean": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 108
+        },
+        "precision": {
+          "mean": 1.0,
+          "n": 67
+        }
+      },
+      "anomaly model only": {
+        "recall_reconciliation": {
+          "mean": 0.04477611940298507,
+          "lo": 0.0,
+          "hi": 0.1044776119402985,
+          "n": 67
+        },
+        "recall_behavioural": {
+          "mean": 0.6037735849056604,
+          "lo": 0.4716981132075472,
+          "hi": 0.7169811320754716,
+          "n": 53
+        },
+        "false_flag_rate_clean": {
+          "mean": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 108
+        },
+        "precision": {
+          "mean": 1.0,
+          "n": 35
+        }
+      },
+      "KYC matcher only": {
+        "recall_reconciliation": {
+          "mean": 0.04477611940298507,
+          "lo": 0.0,
+          "hi": 0.1044776119402985,
+          "n": 67
+        },
+        "recall_behavioural": {
+          "mean": 0.05660377358490566,
+          "lo": 0.0,
+          "hi": 0.1320754716981132,
+          "n": 53
+        },
+        "false_flag_rate_clean": {
+          "mean": 0.05555555555555555,
+          "lo": 0.018518518518518517,
+          "hi": 0.10185185185185185,
+          "n": 108
+        },
+        "precision": {
+          "mean": 0.5,
+          "n": 12
+        }
+      },
+      "reconciliation + anomaly": {
+        "recall_reconciliation": {
+          "mean": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 67
+        },
+        "recall_behavioural": {
+          "mean": 0.6037735849056604,
+          "lo": 0.4716981132075472,
+          "hi": 0.7169811320754716,
+          "n": 53
+        },
+        "false_flag_rate_clean": {
+          "mean": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 108
+        },
+        "precision": {
+          "mean": 1.0,
+          "n": 99
+        }
+      },
+      "reconciliation + KYC": {
+        "recall_reconciliation": {
+          "mean": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 67
+        },
+        "recall_behavioural": {
+          "mean": 0.05660377358490566,
+          "lo": 0.0,
+          "hi": 0.1320754716981132,
+          "n": 53
+        },
+        "false_flag_rate_clean": {
+          "mean": 0.05555555555555555,
+          "lo": 0.018518518518518517,
+          "hi": 0.10185185185185185,
+          "n": 108
+        },
+        "precision": {
+          "mean": 0.9210526315789473,
+          "n": 76
+        }
+      },
+      "anomaly + KYC": {
+        "recall_reconciliation": {
+          "mean": 0.08955223880597014,
+          "lo": 0.029850746268656716,
+          "hi": 0.16417910447761194,
+          "n": 67
+        },
+        "recall_behavioural": {
+          "mean": 0.6415094339622641,
+          "lo": 0.5094339622641509,
+          "hi": 0.7547169811320755,
+          "n": 53
+        },
+        "false_flag_rate_clean": {
+          "mean": 0.05555555555555555,
+          "lo": 0.018518518518518517,
+          "hi": 0.10185185185185185,
+          "n": 108
+        },
+        "precision": {
+          "mean": 0.8695652173913043,
+          "n": 46
+        }
+      },
+      "full, LOW-severity findings also count": {
+        "recall_reconciliation": {
+          "mean": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 67
+        },
+        "recall_behavioural": {
+          "mean": 0.6415094339622641,
+          "lo": 0.5094339622641509,
+          "hi": 0.7547169811320755,
+          "n": 53
+        },
+        "false_flag_rate_clean": {
+          "mean": 0.05555555555555555,
+          "lo": 0.018518518518518517,
+          "hi": 0.10185185185185185,
+          "n": 108
+        },
+        "precision": {
+          "mean": 0.9439252336448598,
+          "n": 107
+        }
+      },
+      "full, only HIGH-severity findings count": {
+        "recall_reconciliation": {
+          "mean": 0.8059701492537313,
+          "lo": 0.7014925373134329,
+          "hi": 0.8955223880597015,
+          "n": 67
+        },
+        "recall_behavioural": {
+          "mean": 0.6415094339622641,
+          "lo": 0.5094339622641509,
+          "hi": 0.7547169811320755,
+          "n": 53
+        },
+        "false_flag_rate_clean": {
+          "mean": 0.05555555555555555,
+          "lo": 0.018518518518518517,
+          "hi": 0.10185185185185185,
+          "n": 108
+        },
+        "precision": {
+          "mean": 0.9361702127659575,
+          "n": 94
+        }
+      },
+      "full, settlement-status rules also count": {
+        "recall_reconciliation": {
+          "mean": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 67
+        },
+        "recall_behavioural": {
+          "mean": 0.6415094339622641,
+          "lo": 0.5094339622641509,
+          "hi": 0.7547169811320755,
+          "n": 53
+        },
+        "false_flag_rate_clean": {
+          "mean": 0.05555555555555555,
+          "lo": 0.018518518518518517,
+          "hi": 0.10185185185185185,
+          "n": 108
+        },
+        "precision": {
+          "mean": 0.9439252336448598,
+          "n": 107
+        }
+      }
+    }
+  }
+}

@@ -60,7 +60,7 @@ def test_teacher_decision_follows_the_engine_floor_and_never_escalates(ctx: Agen
         target = teacher_investigation(evidence)
         floor, _ = engine_floor(evidence, PolicyConfig())
         assert target.recommended_action == (Decision.REVIEW if floor else Decision.CLEAR)
-        assert target.recommended_action != Decision.ESCALATE
+        assert target.recommended_action.value != "ESCALATE"
 
 
 def test_teacher_output_round_trips_the_schema_and_is_deterministic(ctx: AgentContext) -> None:

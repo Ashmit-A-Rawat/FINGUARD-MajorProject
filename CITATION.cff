@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "FIN-GUARD: an on-premise multi-agent system for KYC verification and transaction anomaly remediation (research prototype, synthetic data)"
+type: software
+authors:
+  - family-names: Rawat
+    given-names: Ashmit Singh
+repository-code: "https://github.com/Ashmit-A-Rawat/FINGUARD-MajorProject"
+license: MIT

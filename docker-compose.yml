@@ -1,4 +1,6 @@
-# Phase 1: database only. Backend/frontend services are added in later phases.
+# FIN-GUARD: PostgreSQL + API + web UI. TLS termination is expected in front of the "web" service.
+#   API_SECRET_KEY=$(openssl rand -base64 48) docker compose up --build
+#   docker compose exec -e FINGUARD_PASSWORD='...' api python scripts/create_user.py alice analyst
 services:
   postgres:
     image: postgres:16
@@ -6,9 +8,39 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-finguard}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-finguard}
       POSTGRES_DB: ${POSTGRES_DB:-finguard}
-    ports:
-      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-finguard}"]
+      interval: 5s
+      retries: 10
+
+  api:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      APP_ENV: production
+      API_SECRET_KEY: ${API_SECRET_KEY:?set API_SECRET_KEY (at least 32 random characters)}
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-finguard}:${POSTGRES_PASSWORD:-finguard}@postgres:5432/${POSTGRES_DB:-finguard}
+      LLM_PROVIDER: ${LLM_PROVIDER:-mock}
+      LLM_MODEL: ${LLM_MODEL:-}
+      LLM_ADAPTER: ${LLM_ADAPTER:-}
+      LLM_DEVICE: cpu
+      CORS_ORIGINS: ""
+    volumes:
+      - ./llm/models:/app/llm/models:ro
+      - ./llm/fine_tuning/adapters:/app/llm/fine_tuning/adapters:ro
+    expose: ["8000"]
+
+  web:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    depends_on: [api]
+    ports:
+      - "8080:80"
+
 volumes:
   pgdata:

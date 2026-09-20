@@ -6,7 +6,9 @@ An on-premise multi-agent AI system for automated KYC verification and financial
 
 ## Status
 
-Short running summary: [docs/PROGRESS.md](docs/PROGRESS.md). Phases 1-11 complete: skeleton, data, pipeline, KYC, anomaly detection, reconciliation, knowledge base, LLM layer, the multi-agent workflow (state machine, agents, audit trail, human sign-off), and guardrails (claim-level evidence validation, engine policy floor, injection tripwire), and the human-review API and UI (roles, hash-chained audit trail, four-eyes escalation). Fine-tuning and the full ablation study are not built yet. Real local inference needs a deliberate model download (see docs/architecture/llm-architecture.md).
+All 14 phases are built. Short running summary: [docs/PROGRESS.md](docs/PROGRESS.md); every result with its threats to validity: [docs/research/experiments.md](docs/research/experiments.md); generated cross-experiment table: [docs/research/results-summary.md](docs/research/results-summary.md); how to reproduce: [docs/research/reproduce.md](docs/research/reproduce.md).
+
+**One step is deliberately left to a GPU machine:** training the LoRA adapter (RQ6). Everything else, including the evaluation script for the fine-tuned arms, is in place: [docs/architecture/finetune-on-gpu-pc.md](docs/architecture/finetune-on-gpu-pc.md). Until then RQ6 is reported as PENDING, not estimated. Real local inference needs a deliberate model download (see docs/architecture/llm-architecture.md).
 
 ## Architecture
 
@@ -36,6 +38,8 @@ cp .env.example .env
 | Knowledge-base retrieval benchmark | `make rag-benchmark` |
 | Reconciliation eval | `make reconciliation-eval` |
 | Anomaly benchmark | `make anomaly-benchmark` (report in `evaluation/reports/anomaly/`); progress: `scripts/run_status.sh <log>` |
+| Containers (API + web + PostgreSQL) | `API_SECRET_KEY=$(openssl rand -base64 48) docker compose up --build`, see [deployment](docs/architecture/deployment-architecture.md) |
+| Ablations / adversarial tests | `make ablation`, `make adversarial`, `make results-report` |
 | Backend API | `make api` (needs a user: `FINGUARD_PASSWORD='...' python scripts/create_user.py alice analyst`); docs in [docs/api/api.md](docs/api/api.md) |
 | Frontend | `make frontend-dev` (http://localhost:5173), tests: `make frontend-test` |
 | Guardrail evaluation | `make guardrail-eval` |

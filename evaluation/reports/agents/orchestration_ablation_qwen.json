@@ -1,0 +1,463 @@
+{
+  "notice": "SYNTHETIC. n cases held out in time; greedy decoding; one run per case.",
+  "provider": "qwen",
+  "model": "llm/models/qwen2.5-0.5b-instruct",
+  "is_mock": false,
+  "setup_seconds_once": 14.077591166016646,
+  "n_cases": 24,
+  "decision_accuracy": {
+    "multi_model_only": {
+      "mean": 0.4583333333333333,
+      "lo": 0.25,
+      "hi": 0.6666666666666666
+    },
+    "multi_after_guardrails": {
+      "mean": 0.5833333333333334,
+      "lo": 0.375,
+      "hi": 0.7916666666666666
+    },
+    "single_model_only": {
+      "mean": 0.2916666666666667,
+      "lo": 0.125,
+      "hi": 0.5
+    }
+  },
+  "paired_multi_vs_single_model_only": {
+    "multi_right_single_wrong": 5,
+    "single_right_multi_wrong": 1
+  },
+  "first_attempt_valid": {
+    "multi": {
+      "mean": 0.75,
+      "lo": 0.5833333333333334,
+      "hi": 0.9166666666666666
+    },
+    "single": {
+      "mean": 0.5416666666666666,
+      "lo": 0.3333333333333333,
+      "hi": 0.75
+    }
+  },
+  "wall_s": {
+    "multi": {
+      "mean": 15.766238361124124,
+      "lo": 12.474660386044253,
+      "hi": 19.4019054358333
+    },
+    "single": {
+      "mean": 24.93141163549929,
+      "lo": 19.21551354191188,
+      "hi": 30.782875479201675
+    }
+  },
+  "cases": [
+    {
+      "case_id": "CASE-CUST-000286-TXN-00018123",
+      "category": "reconciliation",
+      "truth_problem": true,
+      "multi": {
+        "valid_first_attempt": false,
+        "model_decision": null,
+        "final_decision": "REVIEW",
+        "wall_s": 33.4851073329919,
+        "status": "human_review"
+      },
+      "single": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "wall_s": 10.734655458974885
+      }
+    },
+    {
+      "case_id": "CASE-CUST-000778-TXN-00018468",
+      "category": "reconciliation",
+      "truth_problem": true,
+      "multi": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "final_decision": "REVIEW",
+        "wall_s": 13.564896416995907,
+        "status": "human_review"
+      },
+      "single": {
+        "valid_first_attempt": false,
+        "model_decision": null,
+        "wall_s": 45.27091633400414
+      }
+    },
+    {
+      "case_id": "CASE-CUST-000945-TXN-00016755",
+      "category": "reconciliation",
+      "truth_problem": true,
+      "multi": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "final_decision": "REVIEW",
+        "wall_s": 12.980811916990206,
+        "status": "human_review"
+      },
+      "single": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "wall_s": 12.001706707989797
+      }
+    },
+    {
+      "case_id": "CASE-CUST-000408-TXN-00016769",
+      "category": "reconciliation",
+      "truth_problem": true,
+      "multi": {
+        "valid_first_attempt": false,
+        "model_decision": null,
+        "final_decision": "REVIEW",
+        "wall_s": 30.576617874990916,
+        "status": "human_review"
+      },
+      "single": {
+        "valid_first_attempt": false,
+        "model_decision": null,
+        "wall_s": 47.19050399999833
+      }
+    },
+    {
+      "case_id": "CASE-CUST-000658-TXN-00016985",
+      "category": "reconciliation",
+      "truth_problem": true,
+      "multi": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "final_decision": "REVIEW",
+        "wall_s": 9.212796666979557,
+        "status": "human_review"
+      },
+      "single": {
+        "valid_first_attempt": false,
+        "model_decision": null,
+        "wall_s": 51.91245158298989
+      }
+    },
+    {
+      "case_id": "CASE-CUST-000822-TXN-00018136",
+      "category": "reconciliation",
+      "truth_problem": true,
+      "multi": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "final_decision": "REVIEW",
+        "wall_s": 20.21529979101615,
+        "status": "human_review"
+      },
+      "single": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "wall_s": 17.02452491701115
+      }
+    },
+    {
+      "case_id": "CASE-CUST-000231-TXN-00016315",
+      "category": "reconciliation",
+      "truth_problem": true,
+      "multi": {
+        "valid_first_attempt": false,
+        "model_decision": null,
+        "final_decision": "REVIEW",
+        "wall_s": 24.976306166005088,
+        "status": "human_review"
+      },
+      "single": {
+        "valid_first_attempt": false,
+        "model_decision": null,
+        "wall_s": 43.53340387501521
+      }
+    },
+    {
+      "case_id": "CASE-CUST-000353-TXN-00018446",
+      "category": "reconciliation",
+      "truth_problem": true,
+      "multi": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "final_decision": "REVIEW",
+        "wall_s": 16.429751625022618,
+        "status": "human_review"
+      },
+      "single": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "wall_s": 12.803955250012223
+      }
+    },
+    {
+      "case_id": "CASE-CUST-000686-TXN-00019534",
+      "category": "behavioural",
+      "truth_problem": true,
+      "multi": {
+        "valid_first_attempt": false,
+        "model_decision": null,
+        "final_decision": null,
+        "wall_s": 37.92139075000887,
+        "status": "human_review"
+      },
+      "single": {
+        "valid_first_attempt": false,
+        "model_decision": null,
+        "wall_s": 57.63808933398104
+      }
+    },
+    {
+      "case_id": "CASE-CUST-000214-TXN-00017285",
+      "category": "behavioural",
+      "truth_problem": true,
+      "multi": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "final_decision": "REVIEW",
+        "wall_s": 9.218013499979861,
+        "status": "human_review"
+      },
+      "single": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "wall_s": 8.62529616698157
+      }
+    },
+    {
+      "case_id": "CASE-CUST-000203-TXN-00017738",
+      "category": "behavioural",
+      "truth_problem": true,
+      "multi": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "final_decision": "REVIEW",
+        "wall_s": 6.803300375002436,
+        "status": "human_review"
+      },
+      "single": {
+        "valid_first_attempt": false,
+        "model_decision": null,
+        "wall_s": 25.865461833018344
+      }
+    },
+    {
+      "case_id": "CASE-CUST-000293-TXN-00019494",
+      "category": "behavioural",
+      "truth_problem": true,
+      "multi": {
+        "valid_first_attempt": false,
+        "model_decision": null,
+        "final_decision": null,
+        "wall_s": 25.80072970900801,
+        "status": "human_review"
+      },
+      "single": {
+        "valid_first_attempt": false,
+        "model_decision": null,
+        "wall_s": 31.497744583000895
+      }
+    },
+    {
+      "case_id": "CASE-CUST-000211-TXN-00018341",
+      "category": "behavioural",
+      "truth_problem": true,
+      "multi": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "final_decision": "REVIEW",
+        "wall_s": 7.959780583012616,
+        "status": "human_review"
+      },
+      "single": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "wall_s": 9.152137083001435
+      }
+    },
+    {
+      "case_id": "CASE-CUST-000848-TXN-00017516",
+      "category": "behavioural",
+      "truth_problem": true,
+      "multi": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "final_decision": "REVIEW",
+        "wall_s": 6.386421625007642,
+        "status": "human_review"
+      },
+      "single": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "wall_s": 15.17467220898834
+      }
+    },
+    {
+      "case_id": "CASE-CUST-000430-TXN-00017071",
+      "category": "behavioural",
+      "truth_problem": true,
+      "multi": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "final_decision": "REVIEW",
+        "wall_s": 6.846112208993873,
+        "status": "human_review"
+      },
+      "single": {
+        "valid_first_attempt": false,
+        "model_decision": null,
+        "wall_s": 32.5805000840046
+      }
+    },
+    {
+      "case_id": "CASE-CUST-000404-TXN-00018671",
+      "category": "behavioural",
+      "truth_problem": true,
+      "multi": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "final_decision": "REVIEW",
+        "wall_s": 10.66949304100126,
+        "status": "human_review"
+      },
+      "single": {
+        "valid_first_attempt": false,
+        "model_decision": null,
+        "wall_s": 35.53926154199871
+      }
+    },
+    {
+      "case_id": "CASE-CUST-000880-TXN-00016292",
+      "category": "clean",
+      "truth_problem": false,
+      "multi": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "final_decision": "REVIEW",
+        "wall_s": 9.843980500008911,
+        "status": "human_review"
+      },
+      "single": {
+        "valid_first_attempt": false,
+        "model_decision": null,
+        "wall_s": 32.221335415990325
+      }
+    },
+    {
+      "case_id": "CASE-CUST-000504-TXN-00019337",
+      "category": "clean",
+      "truth_problem": false,
+      "multi": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "final_decision": "REVIEW",
+        "wall_s": 13.170883624989074,
+        "status": "human_review"
+      },
+      "single": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "wall_s": 17.466017541009933
+      }
+    },
+    {
+      "case_id": "CASE-CUST-000018-TXN-00016577",
+      "category": "clean",
+      "truth_problem": false,
+      "multi": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "final_decision": "REVIEW",
+        "wall_s": 10.282585292006843,
+        "status": "human_review"
+      },
+      "single": {
+        "valid_first_attempt": false,
+        "model_decision": null,
+        "wall_s": 34.58623337501194
+      }
+    },
+    {
+      "case_id": "CASE-CUST-000513-TXN-00017384",
+      "category": "clean",
+      "truth_problem": false,
+      "multi": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "final_decision": "REVIEW",
+        "wall_s": 9.037657708016923,
+        "status": "human_review"
+      },
+      "single": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "wall_s": 16.38408241700381
+      }
+    },
+    {
+      "case_id": "CASE-CUST-000631-TXN-00018683",
+      "category": "clean",
+      "truth_problem": false,
+      "multi": {
+        "valid_first_attempt": false,
+        "model_decision": null,
+        "final_decision": null,
+        "wall_s": 29.69293337498675,
+        "status": "human_review"
+      },
+      "single": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "wall_s": 12.317736791999778
+      }
+    },
+    {
+      "case_id": "CASE-CUST-000447-TXN-00018196",
+      "category": "clean",
+      "truth_problem": false,
+      "multi": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "final_decision": "REVIEW",
+        "wall_s": 13.339207041979535,
+        "status": "human_review"
+      },
+      "single": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "wall_s": 12.562292457994772
+      }
+    },
+    {
+      "case_id": "CASE-CUST-000273-TXN-00017368",
+      "category": "clean",
+      "truth_problem": false,
+      "multi": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "final_decision": "REVIEW",
+        "wall_s": 10.835899708996294,
+        "status": "human_review"
+      },
+      "single": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "wall_s": 7.412617791997036
+      }
+    },
+    {
+      "case_id": "CASE-CUST-000636-TXN-00017422",
+      "category": "clean",
+      "truth_problem": false,
+      "multi": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "final_decision": "REVIEW",
+        "wall_s": 9.139743832987733,
+        "status": "human_review"
+      },
+      "single": {
+        "valid_first_attempt": true,
+        "model_decision": "REVIEW",
+        "wall_s": 8.858282500004862
+      }
+    }
+  ]
+}

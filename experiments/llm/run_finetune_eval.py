@@ -52,6 +52,8 @@ def run_case(provider: LLMProvider, record: CaseRecord, rag: bool) -> dict[str, 
         "model_decision": None,
         "floor": None,
         "flags": [],
+        "parse_error": parsed.error,
+        "raw_head": None if parsed.ok else result.text[:400],
     }
     report = CRITIQUE.review(
         record.evidence_objects(), parsed.value, record.chunk_objects() if rag else []
@@ -104,6 +106,11 @@ def main() -> None:
     ap.add_argument("--model", default="llm/models/qwen2.5-0.5b-instruct")
     ap.add_argument("--adapter", default="llm/fine_tuning/adapters/qwen0.5b-lora-v1")
     ap.add_argument("--reference-model", default="", help="optional larger model, inference only")
+    ap.add_argument(
+        "--reference-only",
+        action="store_true",
+        help="skip the primary model, run only --reference-model",
+    )
     ap.add_argument("--data", type=Path, default=Path("data/finetune"))
     ap.add_argument("--device", default="auto")
     ap.add_argument("--limit", type=int, default=0, help="use only the first N cases (smoke test)")
@@ -124,13 +131,13 @@ def main() -> None:
         provider = LocalQwenProvider(
             args.model, args.device, False, args.adapter if have_adapter else ""
         )
-    arms = [a for a in ARMS if have_adapter or not a[1]]
+    arms = [] if args.reference_only else [a for a in ARMS if have_adapter or not a[1]]
     if not have_adapter:
         print(f"adapter not found at {args.adapter}: running the base-model arms only")
 
     report: dict[str, Any] = {
         "is_mock": mock,
-        "model": args.model,
+        "model": args.reference_model if args.reference_only else args.model,
         "adapter": args.adapter if have_adapter else None,
         "n_eval": len(eval_set),
         "n_injected": len(injected),
@@ -159,8 +166,25 @@ def main() -> None:
             }
     if args.reference_model and not mock:
         provider = LocalQwenProvider(args.reference_model, args.device, False, "")
-        rows = [run_case(provider, r, True) for r in eval_set]
-        report["arms"]["reference_1.5b_rag"] = {"summary": summarise(rows), "rows": rows}
+        tag = Path(args.reference_model).name
+        for rag in (False, True):
+            rows = [run_case(provider, r, rag) for r in eval_set]
+            name = f"reference_{tag}_{'rag' if rag else 'norag'}"
+            report["arms"][name] = {"summary": summarise(rows), "rows": rows}
+            print(
+                f"{name}: valid={report['arms'][name]['summary']['first_attempt_valid']['mean']:.2f}",
+                flush=True,
+            )
+            if rag:
+                inj = [run_case(provider, r, rag) for r in injected]
+                report["injection"][name] = {
+                    "n": len(inj),
+                    "model_said_clear": sum(r["model_decision"] == "CLEAR" for r in inj),
+                    "output_repeats_instruction": sum(
+                        "OUTPUT_CONTAINS_INSTRUCTION_LIKE_TEXT" in r["flags"] for r in inj
+                    ),
+                    "rows": inj,
+                }
     report["seconds"] = round(time.time() - started, 1)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(report, indent=2, default=str))

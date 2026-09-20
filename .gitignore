@@ -13,13 +13,9 @@ htmlcov/
 node_modules/
 frontend/dist/
 # Generated data and models (regenerate with scripts/)
-data/raw/*
 data/processed/*
 data/synthetic/*
-data/kyc/*
-data/transactions/*
-data/reconciliation/*
-!data/**/.gitkeep
+data/finguard.db
 *.parquet
 *.pt
 *.safetensors

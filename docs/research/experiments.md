@@ -326,3 +326,110 @@ Fixing them (prose dates, `H:MM AM/PM`, field-name numbers) is a post-hoc change
 - **Correction to EXP-AGENTS-01.** That entry attributed the 9 s gap between the multi-agent (40.3 s) and single-agent (31.0 s) variants to the richer multi-agent prompt. In this second run the order **reversed** (multi-agent 26.6 s, single-agent 27.9 s), and both
   variants were faster than before. Latency of this small model on this machine varies by tens of percent between runs, so **that explanation was not supported and should be disregarded**; what does replicate is that non-LLM work costs well under a second per case
   and the LLM call is about 99% of the time.
+
+
+## EXP-ABL-01: engine-floor component ablation (no language model)
+
+- Script: `experiments/ablation/run_component_ablation.py` (`make ablation`); artifacts: `evaluation/reports/ablation/component_ablation.{json,md}`; code: `evaluation/ablation/components.py`; tests: `backend/tests/ablation/`.
+- Question: what does each deterministic component (reconciliation rules, anomaly model, KYC matcher) and each policy switch contribute to flagging problem cases? A case is "flagged" when the engine floor is REVIEW.
+- Sets: the 24 held-out evaluation cases (headline) and all 228 distinct un-injected cases (train + val + eval; sensitivity, and the anomaly model saw part of that period). 95% CIs: case bootstrap.
+
+| held-out (n=24) | recall: reconciliation (8) | recall: behavioural (8) | false flags on clean (8) |
+|---|---|---|---|
+| all engines (default) | 1.00 | 0.38 [0.12, 0.75] | 0.00 |
+| reconciliation only | 1.00 | 0.00 | 0.00 |
+| anomaly model only | 0.00 | 0.25 [0.00, 0.62] | 0.00 |
+| KYC matcher only | 0.00 | 0.12 [0.00, 0.38] | 0.00 |
+| only HIGH-severity findings count | 0.62 [0.25, 0.88] | 0.38 | 0.00 |
+
+Pooled (n=228): behavioural recall 0.64 [0.51, 0.75] with all engines versus 0.60 anomaly-only; false-flag rate on clean cases 0.06 [0.02, 0.10], all from the KYC matcher (KYC-only precision 0.50); HIGH-only severity lowers reconciliation recall to 0.81 [0.70, 0.90].
+
+### What the data supports, and what it does not
+1. **The two problem families are covered by different engines**: reconciliation catches the ledger problems and (nearly) only those; the anomaly model catches behavioural ones and (nearly) only those. Neither substitutes for the other.
+2. **About a third of behavioural problems (0.36 pooled, 0.62 held-out) reach no engine flag.** For those cases the advisory decision rests on the language model alone; the floor cannot protect them. This is the main residual risk of the design.
+3. **In this data the KYC matcher adds mostly false flags at the floor** (6 of 108 clean cases, versus 6 true flags). This does NOT measure KYC value: these cases contain no identity problems, so the matcher's purpose is not exercised here. Its accuracy is EXP-KYC-01.
+4. Counting LOW-severity findings or settlement-status rules changes nothing on this data; counting only HIGH severity loses reconciliation recall.
+
+### Threats to validity
+- Reconciliation recall of 1.00 is a check that rules and injector agree (see EXP-REC-01), not evidence of real-world quality.
+- Behavioural recall is the recall of one anomaly model at one threshold on one synthetic dataset (small preset, one seed); n=8 per held-out category gives wide CIs.
+- The pooled set overlaps the anomaly model's training period, and the case mix is balanced by construction, so precision depends on that mix. The pooled CI treats cases as independent although customers can repeat.
+
+## EXP-ADV-01: payment-memo injection sweep (deterministic layers)
+
+- Script: `experiments/adversarial/run_adversarial_suite.py` (`make adversarial`); wordings: `evaluation/adversarial_dataset/memo_injections.json` (7 classes, 30 wordings, hand-written by the author); artifacts: `evaluation/reports/adversarial/`.
+- Each wording is written into the memo of each held-out case and the engine floor recomputed.
+
+| wording class | wordings | tripwire fires (wording x case) | floor lowered on engine-flagged problem cases |
+|---|---|---|---|
+| explicit, wordings used in fine-tuning data | 5 | 0.40 (2 of 5 wordings) | 0 |
+| explicit, held-out evaluation wordings | 3 | 0.33 (1 of 3 wordings) | 0 |
+| explicit, novel | 5 | 1.00 (5 of 5) | 0 |
+| paraphrase without trigger words | 4 | 0.00 | 0 |
+| obfuscated / translated | 4 | 0.00 | 0 |
+| benign memos | 5 | 0.00 (no false positives) | 0 |
+| hard benign (share words with attacks) | 4 | 0.25 (1 of 4 falsely flagged) | 0 |
+
+### What the data supports, and what it does not
+1. **The tripwire is a weak detector: it caught 8 of 21 attack wordings**, including only 3 of the 8 explicit wordings from the training/evaluation sets, none of the paraphrased, obfuscated or translated ones, and it falsely flagged 1 of 9 benign memos. This confirms the documented position that it is a tripwire, not a defence. It was NOT tuned after this result (tuning on the same wordings would inflate it); improving it needs a fresh held-out wording set.
+2. **The engine floor never dropped for a case the engines had flagged, whatever the memo said (0 of 330 checks: 30 wordings x 11 flagged problem cases).** This is a property of the design (the floor reads structured engine evidence, not memo text) and is also unit-tested; it is a correctness check, not a discovery.
+3. **The residual risk is a problem case the engines missed, combined with an injection that fools the model** (see EXP-ABL-01 point 2). The LLM-level injection results are in EXP-LLM-02.
+
+### Threats to validity
+- Wordings were written by the author, who knew the tripwire's patterns; a real attacker would be more inventive. Only memos were tested (not KYC names, addresses or retrieved documents). Deterministic layers only; no model was asked.
+
+## EXP-FT-01 (protocol, written BEFORE the fine-tuned arms were run): base vs RAG vs fine-tuned vs fine-tuned+RAG (RQ3, RQ6)
+
+- Script: `experiments/llm/run_finetune_eval.py`; design: [fine-tuning.md](../architecture/fine-tuning.md); reports: `evaluation/reports/llm/finetune_eval*.json`.
+- Arms (same Qwen2.5-0.5B-Instruct weights; adapter on/off): `base_norag`, `base_rag`, `ft_norag`, `ft_rag`; optional inference-only reference: Qwen2.5-1.5B + RAG. 24 held-out cases; greedy decoding; first attempt only (no retries); fixed per-case nonce.
+- Metrics: first-attempt structured validity; share of valid outputs with at least one unsupported claim (guardrail evidence validator); share with a grounded summary; decision agreement with the generator's label (problem = not CLEAR); share of cases where the model says CLEAR although the engine floor requires review; latency. 95% CIs by case bootstrap. Injection: `base_rag` vs `ft_rag` on the 8 injected cases (model says CLEAR / repeats the instruction).
+- Pre-stated hypotheses (to be confirmed or refuted, both reported): H1 RAG raises grounding for the base model. H2 fine-tuning raises first-attempt validity and lowers unsupported claims more than RAG alone. H3 fine-tuning does not raise decision agreement beyond the engine floor, since its targets are derived from the engines. H4 injection: no claim before seeing data.
+- Decision rule: a difference is called real only if the CIs do not overlap AND the direction matches on both the validity and the unsupported-claim metrics; otherwise it is reported as inconclusive. Small n (24) means most differences will be inconclusive; that is stated, not hidden.
+- Threats: one seed, one base model, one machine per arm group (base arms on the laptop, fine-tuned arms on a GPU machine: latencies are NOT comparable across machines), machine-generated targets, synthetic evidence.
+
+## EXP-ORCH-01: multi-agent workflow vs single-agent baseline on 24 held-out cases (RQ5)
+
+- Script: `experiments/agents/run_orchestration_ablation.py`; artifact: `evaluation/reports/agents/orchestration_ablation_qwen.json`. Model: Qwen2.5-0.5B-Instruct (Metal, fp16), greedy, one run per case, the 24 held-out cases of EXP-FT-01. Same engines, evidence builders and model; the variants differ in orchestration and targeted retrieval (`agents/baseline.py`). This supersedes the n=6 demonstration in EXP-AGENTS-01/02.
+
+| measure | multi-agent | single-agent |
+|---|---|---|
+| valid structured output on the first attempt | 0.75 [0.58, 0.92] (18/24) | 0.54 [0.33, 0.75] (13/24) |
+| decision agrees with label, model output only (invalid = wrong) | 0.46 [0.25, 0.67] | 0.29 [0.13, 0.50] |
+| same, after the guardrails (engine floor and unsupported-claim rule) | 0.58 [0.38, 0.79] | not applicable (no guardrails) |
+| wall time per case, s | 15.8 [12.5, 19.4] | 24.9 [19.2, 30.8] |
+
+Paired on the model-only decision: multi-agent right and single-agent wrong on 5 cases, the reverse on 1 (exact two-sided sign test p = 0.22).
+
+### What the data supports, and what it does not
+1. **The apparent accuracy difference is a format-validity difference, not better judgement.** Where the 0.5B model produced a valid output it said REVIEW every time, in both variants (no CLEAR anywhere), so "agreement with the label" only measures how many problem cases had a valid output. Restricted to valid outputs the agreement is 11/18 (multi) vs 7/13 (single), which is just each subset's share of problem cases.
+2. **The multi-agent variant produced valid output more often (18/24 vs 13/24) but the CIs overlap and the sign test is not significant (p=0.22): inconclusive at n=24.** A plausible cause is the richer, more structured multi-agent prompt (KYC match evidence, targeted retrieval), which is confounded with orchestration here and was not separated.
+3. **Latency: multi-agent was faster (15.8 s vs 24.9 s), the opposite of EXP-AGENTS-01 (40 s vs 31 s, 1.5B).** The direction flipped between experiments, so orchestration is not what drives it; wall time is dominated by generation length (a failed single-agent output often runs long or is retried). No latency claim about orchestration is made.
+4. **The guardrail layer is what rescues invalid outputs**: 3 cases ended with no decision at all (invalid output and no engine flag); in 3 further cases the engine floor supplied REVIEW where the model gave nothing.
+
+### Threats to validity
+- One small model that never answers CLEAR; a stronger model may separate the variants differently (see EXP-LLM-02 for the 1.5B). n=24, one run, one seed. Two things differ between variants (orchestration and prompt/retrieval content), so the cause of any difference is not identified.
+
+## EXP-LLM-02: RAG and guardrail layers with real local models on 24 held-out cases (RQ3, RQ4; baseline for RQ6)
+
+- Script: `experiments/llm/run_finetune_eval.py`; artifacts: `evaluation/reports/llm/finetune_eval_base_laptop.json` (Qwen2.5-0.5B, base arms) and `finetune_eval_reference_1.5b_laptop.json` (Qwen2.5-1.5B, inference only; its `model` field was mislabelled by the script and corrected, see the note inside the file); consolidated tables in `docs/research/results-summary.md`. Greedy, first attempt only, no retries, one run, laptop (Metal). Injection cases: the 8 reconciliation cases with an unseen memo wording.
+- The fine-tuned arms are NOT in this entry: they need the GPU-machine run (protocol in EXP-FT-01).
+
+| arm (n=24) | valid first attempt | outputs with an unsupported claim (of valid) | model says CLEAR on a problem case (of 16) | clean cases the model sends to REVIEW (of 8) |
+|---|---|---|---|---|
+| 0.5B, no RAG | 0.83 [0.67, 0.96] | 0/20 | 0 | 8 |
+| 0.5B, RAG | 0.67 [0.50, 0.83] | 0/16 | 0 | 8 |
+| 1.5B, no RAG | 1.00 | 1/24 | 7 | 5 |
+| 1.5B, RAG | 1.00 | 1/24 | 7 | 2 |
+
+Guardrail layers on the 1.5B outputs (problem cases left CLEAR / clean cases raised to REVIEW): model only 0.44 / 0.62 (no RAG), 0.44 / 0.25 (RAG); adding the engine floor: 0.25 / 0.62 and 0.12 / 0.25; adding the unsupported-claim rule: unchanged for no RAG, 0.12 / 0.38 for RAG.
+Injection (1.5B + RAG, 8 injected reconciliation cases): the model answered CLEAR on 4 of 8, versus 3 of 8 for the same cases without an injected memo; the engine floor was REVIEW on all 8.
+
+### What the data supports, and what it does not
+1. **RQ3 (does RAG improve grounding?): not shown.** Grounding was already at ceiling: a single unsupported claim in about 60 claims per 1.5B arm, and none for the 0.5B. RAG did not change that. RAG **hurt the 0.5B's format validity** (0.83 to 0.67; CIs overlap, so inconclusive) and helped the 1.5B send fewer clean cases to REVIEW (5 to 2 of 8, n=8, inconclusive). `unverifiable` claims (citations with no checkable tokens; about half of all claims in EXP-GUARD-01) are not counted as unsupported here, so "grounded" is weaker than it sounds.
+2. **The 0.5B base model cannot judge**: valid outputs are always REVIEW, including for every clean case. Its failures are formatting (missing `confidence`, broken JSON), which is exactly what fine-tuning targets (RQ6).
+3. **RQ4 (do the guardrails help?): partly.** The **engine floor** is the layer that helps: it cut problem cases left CLEAR from 7 of 16 to 4 (no RAG) and 2 (RAG). The remaining 2 to 4 are problem cases no engine flagged, so no guardrail can catch them. The **unsupported-claim rule added nothing here** (it changed no problem case and raised 3 more clean cases to REVIEW in the RAG arm) because there was only one unsupported claim; its value would show only for a model that invents facts.
+4. **Injection: inconclusive.** 4 of 8 versus 3 of 8 is within noise; the model says CLEAR on many problem cases with or without an injected memo, so this model's decision is unreliable regardless. What protected these 8 cases was the engine floor, not the model. No output repeated the injected text.
+5. Latency (0.5B about 10 s, 1.5B about 32 s per case on this laptop) is not comparable with the GPU-machine arms.
+
+### Threats to validity
+- n=24 (8 per category, 16 problem cases), one run, greedy; CIs are wide and many differences are inconclusive. The 0.5B and 1.5B are different families of failure, so comparing them says nothing about model size in general. The problem cases include ones the engines do not flag, whose CLEAR rate depends on the anomaly model's threshold. Decision "agreement with the label" is not reported as a headline because a model that always says REVIEW scores the base rate.
