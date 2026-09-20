@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     app_env: str = "development"
     log_level: str = "INFO"
     cors_origins: str = "http://localhost:5173"
+    data_dir: str = "./data"
+    synthetic_seed: int = 42
 
 
 @lru_cache

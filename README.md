@@ -6,7 +6,7 @@ An on-premise multi-agent AI system for automated KYC verification and financial
 
 ## Status
 
-Phase 1 complete: repository skeleton, tooling, health endpoint, tests. No ML, RAG, LLM or agents yet.
+Phase 1 (skeleton) and Phase 2 (schemas + synthetic data generator) complete. No ML, RAG, LLM or agents yet.
 
 ## Architecture
 
@@ -30,7 +30,7 @@ cp .env.example .env
 | Tests | `make test` |
 | Lint / types | `make lint`, `make typecheck` |
 | Postgres | `docker compose up -d postgres` |
-| Generate data | *Phase 2* |
+| Generate data | `make data` or `python scripts/generate_synthetic_data.py --preset small` (see [data architecture](docs/architecture/data-architecture.md)) |
 | Run ML | *Phase 4-5* |
 | Frontend | *Phase 11* |
 | Local LLM | *Phase 8* |
