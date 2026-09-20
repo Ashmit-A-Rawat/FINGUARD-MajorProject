@@ -12,7 +12,7 @@ def create_provider(settings: Settings | None = None) -> LLMProvider:
     if name == "mock":
         return MockLLMProvider()
     if name == "qwen":
-        return LocalQwenProvider(s.llm_model, s.llm_device, s.llm_allow_download)
+        return LocalQwenProvider(s.llm_model, s.llm_device, s.llm_allow_download, s.llm_adapter)
     if name == "mistral":
-        return LocalMistralProvider(s.llm_model, s.llm_device, s.llm_allow_download)
+        return LocalMistralProvider(s.llm_model, s.llm_device, s.llm_allow_download, s.llm_adapter)
     raise ValueError(f"unknown LLM_PROVIDER {s.llm_provider!r}; use mock, qwen or mistral")

@@ -25,8 +25,8 @@ data/reconciliation/*
 *.safetensors
 *.gguf
 *.bin
-knowledge_base/vector_store/*
-!knowledge_base/vector_store/__init__.py
+# persisted vector indexes only (source files in this folder stay tracked)
+knowledge_base/vector_store/*/
 # model weight directories (Python files in llm/models/ stay tracked)
 llm/models/*/
 .DS_Store
@@ -36,3 +36,7 @@ llm/models/*/
 # local databases (may contain case data)
 *.db
 *.sqlite
+
+# fine-tuned adapters and generated training data (regenerable)
+llm/fine_tuning/adapters/
+data/finetune/

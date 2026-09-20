@@ -5,6 +5,7 @@ this provider REFUSES to download them unless ``allow_download`` is set. No netw
 during generation.
 """
 
+import contextlib
 import time
 from pathlib import Path
 from typing import Any
@@ -46,8 +47,16 @@ class LocalHFProvider(LLMProvider):
     name = "local-hf"
     default_model = ""
 
-    def __init__(self, model: str = "", device: str = "auto", allow_download: bool = False) -> None:
+    def __init__(
+        self,
+        model: str = "",
+        device: str = "auto",
+        allow_download: bool = False,
+        adapter: str = "",
+    ) -> None:
         self.model = model or self.default_model
+        self._adapter = adapter  # optional LoRA adapter directory
+        self.use_adapter = True  # False runs the plain base model (for ablations)
         self._device_request = device
         self._allow_download = allow_download
         self._tokenizer: Any = None  # transformers objects are loosely typed
@@ -73,7 +82,12 @@ class LocalHFProvider(LLMProvider):
         dtype = torch.float32 if self.device == "cpu" else torch.float16
         self._tokenizer = AutoTokenizer.from_pretrained(self.model)
         net: Any = AutoModelForCausalLM.from_pretrained(self.model, dtype=dtype)
-        self._net = net.to(self.device).eval()
+        net = net.to(self.device)
+        if self._adapter:
+            from peft import PeftModel
+
+            net = PeftModel.from_pretrained(net, self._adapter)
+        self._net = net.eval()
 
     def generate(self, request: GenerationRequest) -> GenerationResult:
         import torch
@@ -88,7 +102,9 @@ class LocalHFProvider(LLMProvider):
         if request.seed is not None:
             torch.manual_seed(request.seed)
         sample = request.temperature > 0
-        with torch.no_grad():
+        adapter_off = bool(self._adapter) and not self.use_adapter
+        context = net.disable_adapter() if adapter_off else contextlib.nullcontext()
+        with torch.no_grad(), context:
             output = net.generate(
                 **inputs,
                 max_new_tokens=request.max_new_tokens,

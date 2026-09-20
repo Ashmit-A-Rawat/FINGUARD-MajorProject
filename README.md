@@ -6,7 +6,7 @@ An on-premise multi-agent AI system for automated KYC verification and financial
 
 ## Status
 
-Phases 1-11 complete: skeleton, data, pipeline, KYC, anomaly detection, reconciliation, knowledge base, LLM layer, the multi-agent workflow (state machine, agents, audit trail, human sign-off), and guardrails (claim-level evidence validation, engine policy floor, injection tripwire), and the human-review API and UI (roles, hash-chained audit trail, four-eyes escalation). Fine-tuning and the full ablation study are not built yet. Real local inference needs a deliberate model download (see docs/architecture/llm-architecture.md).
+Short running summary: [docs/PROGRESS.md](docs/PROGRESS.md). Phases 1-11 complete: skeleton, data, pipeline, KYC, anomaly detection, reconciliation, knowledge base, LLM layer, the multi-agent workflow (state machine, agents, audit trail, human sign-off), and guardrails (claim-level evidence validation, engine policy floor, injection tripwire), and the human-review API and UI (roles, hash-chained audit trail, four-eyes escalation). Fine-tuning and the full ablation study are not built yet. Real local inference needs a deliberate model download (see docs/architecture/llm-architecture.md).
 
 ## Architecture
 
@@ -40,7 +40,7 @@ cp .env.example .env
 | Frontend | `make frontend-dev` (http://localhost:5173), tests: `make frontend-test` |
 | Guardrail evaluation | `make guardrail-eval` |
 | Multi-agent demo | `make agents-demo` (needs the local model) |
-| Local LLM | `make hardware`; fetch weights deliberately (`scripts/download_model.py` or `scripts/fetch_weights.sh`); set `LLM_PROVIDER=qwen`, `LLM_MODEL=<dir or id>`; check with `make llm-check` |
+| Local LLM | `make hardware`; fetch weights deliberately (`scripts/fetch_weights.sh`); set `LLM_PROVIDER=qwen`, `LLM_MODEL=<dir or id>`; check with `make llm-check` |
 | Evaluation | *Phase 13* |
 
 ## Research questions

@@ -120,7 +120,7 @@ and (3) route anything unsupported to REVIEW. Citation ids are normalised (`norm
 
 ## Local model files
 Weights are never committed (`llm/models/*/` is ignored). `scripts/fetch_weights.sh <url> <file>` is a resumable download for flaky connections
-(reconnects on stalls); `scripts/download_model.py <id> --yes` uses the Hugging Face client. Set `LLM_PROVIDER=qwen` and
+(reconnects on stalls); the Hugging Face client stalled on this network. Set `LLM_PROVIDER=qwen` and
 `LLM_MODEL=llm/models/qwen2.5-1.5b-instruct` (a local directory works, which is what an air-gapped on-premise install needs).
 
 

@@ -58,6 +58,7 @@ select = ["E", "F", "I", "UP", "B", "SIM"]
 [tool.ruff.lint.per-file-ignores]
 "experiments/**" = ["E501"]  # report-rendering strings
 "backend/tests/**" = ["E501"]  # long literal payloads and URLs in tests
+"llm/fine_tuning/*.py" = ["E501"]  # long template sentences are clearer unwrapped
 
 [tool.mypy]
 python_version = "3.11"
