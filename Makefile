@@ -1,6 +1,6 @@
 PY := .venv/bin/python
 
-.PHONY: install test lint typecheck run data pipeline kyc-benchmark anomaly-benchmark
+.PHONY: install test lint typecheck run data pipeline kyc-benchmark anomaly-benchmark reconciliation-eval
 install:
 	$(PY) -m pip install -e ".[dev]"
 test:
@@ -8,7 +8,7 @@ test:
 lint:
 	$(PY) -m ruff check .
 typecheck:
-	$(PY) -m mypy backend data_pipeline scripts kyc evaluation experiments anomaly_detection
+	$(PY) -m mypy backend data_pipeline scripts kyc evaluation experiments anomaly_detection reconciliation
 pipeline:
 	$(PY) scripts/run_pipeline.py --preset small
 data:
@@ -20,3 +20,5 @@ kyc-benchmark:
 anomaly-benchmark:
 	$(PY) scripts/generate_synthetic_data.py --preset medium
 	$(PY) experiments/anomaly/run_anomaly_benchmark.py --preset medium --seed 42
+reconciliation-eval:
+	$(PY) experiments/reconciliation/run_reconciliation_eval.py --preset medium

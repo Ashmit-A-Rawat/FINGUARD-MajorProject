@@ -116,3 +116,33 @@ generated reports in `evaluation/reports/`; regenerate rather than edit. All dat
   No hyperparameter search was done for any model.
 - Latency is single-process CPU: random forest is the slowest per single row (about 27 ms), the temporal models cost about
   14 ms per 1000 rows in batch.
+
+## EXP-REC-01: Reconciliation rules vs injected ledger discrepancies
+
+- Script: `experiments/reconciliation/run_reconciliation_eval.py --preset medium` (`make reconciliation-eval`)
+- Artifact: `evaluation/reports/reconciliation/reconciliation_eval_medium.json`
+- Data: synthetic medium preset, 250,000 transactions, 3,750 injected discrepancies (six types).
+
+| ground-truth type | injected | precision | recall |
+|---|---|---|---|
+| missing_ledger_entry | 562 | 1.000 | 1.000 |
+| duplicate_posting | 562 | 1.000 | 1.000 |
+| contradictory_amount | 1126 | 1.000 | 1.000 |
+| currency_mismatch | 375 | 1.000 | 1.000 |
+| missing_reference | 750 | 1.000 | 1.000 |
+| late_posting | 375 | 1.000 | 1.000 |
+
+Transaction level (core rules REC-001..008): 3750 TP, 0 FP, 0 FN; 0 misattributed types; 0 core-rule findings on
+unlabelled transactions.
+
+**How to read this.** A perfect score is expected and is *not* evidence of real-world quality. The rules are deterministic,
+the injector is deterministic, and the tolerances (1 cent, T+3) were chosen with the data's value ranges in view. It shows
+the engine implements its rules correctly and that the injected discrepancy types are separable. It says nothing about
+messy real ledgers (rounding conventions, FX, partial settlements, timezone differences, reversed postings).
+
+**Findings worth acting on:**
+- Status rules fire on many *unlabelled* rows: REC-009 (failed) 2,643 = 1.1% and REC-010 (stale pending) 9,834 = 3.9% of
+  transactions. This comes from the generator giving random statuses that never resolve, not from injected faults. Overall
+  16,077 of 250,000 transactions (6.4%) have at least one finding, but only 3,750 (1.5%) are injected discrepancies.
+  Downstream consumers (the agents) should treat core and status findings differently.
+- Sender/receiver cannot be reconciled: the ledger schema has no counterparty fields.

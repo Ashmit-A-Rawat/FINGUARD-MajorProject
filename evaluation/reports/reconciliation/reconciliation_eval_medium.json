@@ -1,0 +1,90 @@
+{
+  "notice": "SYNTHETIC data; results do not represent real-bank performance.",
+  "preset": "medium",
+  "config": {
+    "amount_tolerance_cents": 1,
+    "amount_high_severity_pct": 0.1,
+    "amount_medium_severity_pct": 0.01,
+    "max_posting_lag": "P3D",
+    "late_high_severity_multiple": 3.0,
+    "check_settlement_status": true,
+    "stale_pending_after": "P3D"
+  },
+  "counts": {
+    "transactions": 250000,
+    "reconciled": 233923,
+    "with_discrepancy": 16077,
+    "ground_truth_discrepancies": 3750
+  },
+  "rules_fired": {
+    "REC-001": 562,
+    "REC-002": 562,
+    "REC-003": 1126,
+    "REC-004": 375,
+    "REC-005": 750,
+    "REC-008": 375,
+    "REC-009": 2643,
+    "REC-010": 9834
+  },
+  "core_rules_transaction_level": {
+    "tp": 3750,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0
+  },
+  "misattributed_type": 0,
+  "per_type": {
+    "missing_ledger_entry": {
+      "tp": 562,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "duplicate_posting": {
+      "tp": 562,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "contradictory_amount": {
+      "tp": 1126,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "currency_mismatch": {
+      "tp": 375,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "missing_reference": {
+      "tp": 750,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "late_posting": {
+      "tp": 375,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    }
+  },
+  "core_rule_false_positives_by_rule": {},
+  "status_rules_note": "REC-009/010 findings occur on unlabelled normal data (see docstring)"
+}

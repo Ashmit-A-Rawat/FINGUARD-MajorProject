@@ -52,6 +52,16 @@ preset). Protocol and leakage controls: [ml-architecture](../architecture/ml-arc
 Accuracy is deliberately not reported. 95% CIs are a **customer-clustered bootstrap** (200 resamples): rows of one
 customer, especially within an anomaly episode, are correlated, so resampling rows would understate uncertainty.
 
+## Reconciliation (Phase 6; implemented)
+
+Runner: `experiments/reconciliation/run_reconciliation_eval.py` (`make reconciliation-eval`). Ground truth is
+the generator's `ledger_labels.csv` (six injected discrepancy types, one per transaction). Rules REC-001..008
+map onto them; per-type and transaction-level precision/recall are reported, plus misattributed types and any
+core-rule finding on an unlabelled transaction. **This checks that the rules and the injector agree; it is a
+correctness check, not a measure of real-world quality** (both are deterministic and the tolerances were set with the
+data ranges in view). Independent evidence is the hand-built edge cases in `backend/tests/reconciliation/`
+(tolerance boundaries, duplicate ordering, float noise, currency+amount together, immutability).
+
 ## LLM/RAG, agents, guardrails
 
 Defined in Phases 7 onwards.
