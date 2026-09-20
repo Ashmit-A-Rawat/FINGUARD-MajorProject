@@ -28,21 +28,19 @@ from agents.contracts import (
     RetrievalInput,
     ReviewInput,
 )
+from agents.coordinator.signoff import SignOffError, sign_off_case
 from agents.investigator.agent import InvestigationAgent
 from agents.reconciliation.agent import ReconciliationAgent
 from agents.report_generator.agent import ReportAgent
 from agents.reviewer.agent import ReviewerAgent
-from agents.state import CaseState, SignOff
+from agents.state import CaseState
 from backend.app.schemas.domain import CaseStatus, Decision
 from data_pipeline.consolidation.models import CanonicalCase
 from guardrails.self_critique import SelfCritique
 
+__all__ = ["CaseWorkflow", "SignOffError", "Step"]
 logger = logging.getLogger("fin_guard.workflow")
 Details = dict[str, object]
-
-
-class SignOffError(ValueError):
-    """A sign-off violated the human-review rules."""
 
 
 @dataclass(frozen=True)
@@ -157,34 +155,7 @@ class CaseWorkflow:
         reason: str,
         second_reviewer: str | None = None,
     ) -> CaseState:
-        if state.status != CaseStatus.HUMAN_REVIEW:
-            raise SignOffError(f"case is {state.status}, not awaiting human review")
-        if not reviewer.strip() or not reason.strip():
-            raise SignOffError("a named reviewer and a written reason are required")
-        if decision == Decision.ESCALATE:
-            second = (second_reviewer or "").strip()
-            if not second or second.casefold() == reviewer.strip().casefold():
-                raise SignOffError("ESCALATE needs a second, different reviewer (four-eyes rule)")
-        now = self._ctx.clock()
-        state.sign_off = SignOff(
-            reviewer=reviewer.strip(),
-            second_reviewer=second_reviewer,
-            decision=decision,
-            reason=reason.strip(),
-            at=now,
-        )
-        state.status = CaseStatus.CLOSED
-        self._log(
-            state,
-            f"human:{reviewer.strip()}",
-            "sign_off",
-            CaseStatus.HUMAN_REVIEW,
-            CaseStatus.CLOSED,
-            0.0,
-            True,
-            details={"decision": decision.value},
-        )
-        return state
+        return sign_off_case(state, self._ctx.clock, reviewer, decision, reason, second_reviewer)
 
     # ---------------------------------------------------------------- steps
     def _prepare(self, state: CaseState, now: datetime) -> Details:

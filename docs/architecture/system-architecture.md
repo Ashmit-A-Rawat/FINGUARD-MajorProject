@@ -99,3 +99,35 @@ It exists for the RQ5 ablation in Phase 13.
 **Limits.** `build_context` trains the anomaly model at startup from labelled history (fine for the small dataset; a real deployment would load a persisted model). Cases must be
 from the held-out period to avoid optimistic scores (flagged when not). The KYC step matches the case's documents against the customer master with the un-reranked hybrid+structured
 system (no fitted reranker needed).
+
+
+## Human review: API, UI and audit trail (Phase 11)
+
+```
+React UI (Vite, TS, Tailwind) --/api--> FastAPI --> SQLAlchemy (SQLite dev / PostgreSQL) 
+                                           |--> EngineService (loads the analysis engine in a background thread)
+                                           '--> single worker thread runs CaseWorkflow per case
+```
+
+**Persistence.** `cases` holds the workflow state as JSON plus denormalised inbox columns; `audit_events` holds the trail; `users` holds credentials.
+The analysis engine (dataset, KYC index, anomaly model, knowledge base, LLM) loads in the background at startup; the API is usable immediately and reports `engine_ready`.
+Sign-off does not need the engine, so decisions can be recorded even while it is loading.
+
+**Audit trail is append-only and tamper-evident.**
+- Every workflow step, every human action *and every read* (viewing a case, viewing personal details, opening the trail) is an event with actor, action, status transition, duration and small details (no names or document numbers).
+- Sequence numbers are assigned **by the database**, not by the caller, so the background job, an analyst viewing the case and a sign-off can interleave without dropping or duplicating events.
+- Events are hash-chained per case (`hash = SHA-256(previous hash || canonical event)`). Editing, deleting or reordering a stored event breaks the chain, and the API reports the first bad event; the UI shows **CHAIN BROKEN**.
+  The ORM also refuses updates and deletes of audit rows. Both are defence in depth; someone with full write access to the database could recompute the chain, so production must
+  give the API's database role INSERT and SELECT only on `audit_events` (see deployment architecture).
+
+**Security model.** scrypt password hashes; signed tokens with the role re-read from the database each request; login throttling; role checks on every endpoint;
+strict request validation; security headers (`nosniff`, `X-Frame-Options: DENY`, `no-store` on API responses); CORS restricted to configured origins and to GET/POST; a strong `API_SECRET_KEY` is
+mandatory outside development (the app refuses to start otherwise). Personal details are returned only to analysts.
+
+**The UI** shows the ten panels from the brief: case inbox, customer/KYC, transaction timeline, anomaly analysis, reconciliation, retrieved evidence, AI investigation, self-critique and decision and audit trail.
+It never lets model text look authoritative: an advisory banner sits above the AI investigation, every claim carries its verdict and reason, mock output is labelled MOCK, the model's confidence is labelled uncalibrated, and choosing CLEAR against the advisory requires an
+explicit acknowledgement. The server re-checks every rule the UI mirrors.
+
+**Known limits.** No user-management UI or MFA; tokens live in `sessionStorage` (readable by any script that runs in the page, so a strict Content-Security-Policy belongs at the reverse proxy); a token stays valid until it expires unless the user is deactivated;
+the login throttle is per process; TLS must be terminated in front of the API (dev runs over HTTP); the job queue is in-process (a restart loses queued jobs; the case then shows `queued`); PostgreSQL support is written but was not exercised here (no Docker daemon
+was available), so only SQLite is tested.

@@ -1,6 +1,6 @@
 PY := PYTHONPATH=. .venv/bin/python
 
-.PHONY: install test lint typecheck run data pipeline kyc-benchmark anomaly-benchmark reconciliation-eval rag-benchmark hardware llm-check agents-demo guardrail-eval
+.PHONY: install test lint typecheck run data pipeline kyc-benchmark anomaly-benchmark reconciliation-eval rag-benchmark hardware llm-check agents-demo guardrail-eval api frontend-dev frontend-test
 install:
 	$(PY) -m pip install -e ".[dev]"
 test:
@@ -32,3 +32,9 @@ agents-demo:
 	$(PY) experiments/agents/run_workflow_demo.py --provider qwen --model llm/models/qwen2.5-1.5b-instruct
 guardrail-eval:
 	$(PY) experiments/guardrails/run_guardrail_eval.py
+api:
+	$(PY) -m uvicorn backend.app.main:app --port 8000
+frontend-dev:
+	cd frontend && npm run dev
+frontend-test:
+	cd frontend && npm run build && npm test

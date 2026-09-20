@@ -14,6 +14,11 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:5173"
     data_dir: str = "./data"
     synthetic_seed: int = 42
+    database_url: str = "sqlite:///./data/finguard.db"  # Postgres in production
+    api_secret_key: str = "change-me"  # must be a strong secret outside development
+    token_ttl_minutes: int = 480
+    engine_enabled: bool = True  # load the analysis engine at startup
+    dataset_dir: str = "./data/synthetic/small"
     llm_provider: str = "mock"  # mock | qwen | mistral
     llm_model: str = ""  # empty = the provider's default model
     llm_device: str = "auto"  # auto | cpu | mps | cuda
