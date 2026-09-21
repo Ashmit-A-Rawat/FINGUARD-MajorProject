@@ -86,4 +86,5 @@ PENDING: the fine-tuned arms need the adapter trained on a GPU machine (docs/arc
 
 - Engine-floor component ablation: `evaluation/reports/ablation/component_ablation.md` (present)
 - Memo-injection sweep: `evaluation/reports/adversarial/memo_injection_sweep.md` (present)
-- Across 7 wording classes the floor of an engine-flagged problem case was lowered 0 times; the tripwire never caught 13 attack wordings.
+- Tripwire on the blind set v4: regex recall 6/24, false positives 0/20; semantic recall 19/24, false positives 0/20; either recall 19/24, false positives 0/20
+- Across 7 wording classes the floor of an engine-flagged problem case was lowered 0 times; the improved tripwire missed 0 of the v1 development wordings it was tuned on (see the blind-set line above for the honest estimate).

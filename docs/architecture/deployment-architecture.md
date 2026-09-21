@@ -33,6 +33,7 @@ docker compose exec -e FINGUARD_PASSWORD='choose-one' api python scripts/create_
 - **Model weights are not in the image.** Put them under `./llm/models/<name>/` (mounted read-only). Set `LLM_PROVIDER=qwen`, `LLM_MODEL=llm/models/qwen2.5-0.5b-instruct`
   and, for the fine-tuned model, `LLM_ADAPTER=llm/fine_tuning/adapters/qwen0.5b-lora-v1`. The default `LLM_PROVIDER=mock` runs the whole system with clearly labelled mock outputs. The container is CPU-only (`LLM_DEVICE=cpu`); a GPU host needs the NVIDIA container runtime and a CUDA torch build.
 - **Data.** The image generates the small SYNTHETIC dataset at build time (seeded). Replace it by mounting a dataset directory and setting `DATASET_DIR`.
+- `SEMANTIC_TRIPWIRE=true` (default) enables the second, embedding-based injection detector in the API; it needs the MiniLM model already present in the image.
 - **One build-time download**: the MiniLM embedding model. After the build the container needs no network.
 - **TLS** is not handled here: terminate it in front of `web`. Do not publish the API or database ports.
 - **Audit table permissions**: see the database-roles paragraph above; the compose file uses one owner role for simplicity, which is a development convenience, not the production setup.

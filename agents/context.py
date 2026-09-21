@@ -10,6 +10,7 @@ from agents.auditor.anomaly_service import AnomalyService
 from data_pipeline.consolidation.store import ConsolidatedStore
 from data_pipeline.pipeline import run_pipeline
 from knowledge_base.embeddings.embedder import Embedder
+from knowledge_base.ingestion.semantic_tripwire import SemanticTripwire
 from knowledge_base.service import KnowledgeBase, SourceSpec
 from kyc.entity_matcher import KYCEntityMatcher
 from llm.inference.base import LLMProvider
@@ -26,6 +27,7 @@ class AgentContext:
     llm: LLMProvider
     as_of: pd.Timestamp  # end of the loaded data; used for staleness rules
     clock: Clock = utc_now
+    semantic_tripwire: SemanticTripwire | None = None  # opt-in second injection detector
 
 
 def build_context(
@@ -34,6 +36,7 @@ def build_context(
     llm: LLMProvider,
     knowledge_dir: Path = Path("knowledge_base/documents"),
     clock: Clock = utc_now,
+    semantic_tripwire: bool = False,
 ) -> AgentContext:
     """Ingest through the validated pipeline and construct every engine once."""
     result = run_pipeline(data_dir)
@@ -51,4 +54,5 @@ def build_context(
         llm=llm,
         as_of=pd.Timestamp(max(t.timestamp for t in txs)),
         clock=clock,
+        semantic_tripwire=SemanticTripwire.load(embedder) if semantic_tripwire else None,
     )

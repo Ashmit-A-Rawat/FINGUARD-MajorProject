@@ -13,7 +13,7 @@ Goal (RQ6): does parameter-efficient fine-tuning improve domain investigation qu
 Each record holds the real evidence and retrieved chunks produced by the real workflow (mock LLM, real embedder, real engines), the ground-truth label (evaluation only), and metadata.
 - **Time split**: the anomaly model is trained on the earliest 60%; training cases come from 60-80% of time; eval cases from the last 20%.
 - **Customer-disjoint**: no customer appears in both train/val and eval (checked: overlap 0). One case per customer in eval.
-- **Injection wordings disjoint** between train and eval (the third eval wording is deliberately evasive).
+- **Injection wordings disjoint** between train and eval. (The third eval wording was written to evade the original regex tripwire; the improved regex of EXP-ADV-02 now catches it. This does not change what the model sees, only the floor's reasons.)
 
 ## Targets (`llm/fine_tuning/teacher.py`)
 The target for a case is a deterministic function of its EVIDENCE only, never of the ground-truth label: findings cite `E:<id>`, decision REVIEW if the engine floor applies else CLEAR, never ESCALATE (a human judgement), fixed placeholder confidence (0.6 / 0.7, uncalibrated). Across 60 real cases every target has 0 unsupported claims and a grounded summary (tested).

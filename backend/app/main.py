@@ -24,7 +24,10 @@ def _build_engine_context(settings: Settings):  # type: ignore[no-untyped-def]
     from llm.inference.factory import create_provider
 
     return build_context(
-        Path(settings.dataset_dir), SentenceTransformerEmbedder(), create_provider(settings)
+        Path(settings.dataset_dir),
+        SentenceTransformerEmbedder(),
+        create_provider(settings),
+        semantic_tripwire=settings.semantic_tripwire,
     )
 
 

@@ -19,6 +19,7 @@ from pydantic import BaseModel
 from backend.app.schemas.domain import Decision, Evidence, EvidenceSource, Severity
 from guardrails.models import ClaimCheck, PolicyFlag, PolicyResult
 from knowledge_base.ingestion.sanitize import injection_flags
+from knowledge_base.ingestion.semantic_tripwire import SemanticTripwire
 from llm.schemas import InvestigationOutput
 
 DECISION_RANK = {Decision.CLEAR: 0, Decision.REVIEW: 1, Decision.ESCALATE: 2}
@@ -46,18 +47,41 @@ def _strings(value: Any) -> Iterable[str]:
             yield from _strings(v)
 
 
-def suspicious_evidence(evidence: Sequence[Evidence]) -> list[str]:
+FREE_TEXT_KEYS = ("memo", "note", "comment", "remark", "narrative", "text")
+
+
+def free_text(payload: Any) -> Iterable[str]:
+    """Strings under payload keys that hold third-party free text (the semantic tripwire reads only
+    these: ids, dates and engine-generated descriptions are not free text)."""
+    if isinstance(payload, dict):
+        for key, value in payload.items():
+            if isinstance(value, str) and any(k in str(key).lower() for k in FREE_TEXT_KEYS):
+                yield value
+            elif isinstance(value, (dict, list, tuple)):
+                yield from free_text(value)
+    elif isinstance(payload, (list, tuple)):
+        for v in payload:
+            yield from free_text(v)
+
+
+def suspicious_evidence(
+    evidence: Sequence[Evidence], semantic: SemanticTripwire | None = None
+) -> list[str]:
     """Ids of evidence items whose free text looks like an instruction to the model."""
     found = []
     for item in evidence:
         texts = [item.description, *_strings(item.payload)]
-        if any(injection_flags(t) for t in texts):
+        if any(injection_flags(t) for t in texts) or (
+            semantic is not None and any(semantic.is_injection(t) for t in free_text(item.payload))
+        ):
             found.append(item.evidence_id)
     return found
 
 
 def engine_floor(
-    evidence: Sequence[Evidence], config: PolicyConfig
+    evidence: Sequence[Evidence],
+    config: PolicyConfig,
+    semantic: SemanticTripwire | None = None,
 ) -> tuple[Decision | None, list[str]]:
     reasons: list[str] = []
     minimum = SEVERITY_RANK[config.floor_min_severity]
@@ -83,7 +107,7 @@ def engine_floor(
             if any(str(c).startswith("dob_") for c in payload.get("own_contradictions", [])):
                 reasons.append(f"KYC: date-of-birth conflict [{e.evidence_id}]")
     if config.suspicious_evidence_forces_review:
-        for evidence_id in suspicious_evidence(evidence):
+        for evidence_id in suspicious_evidence(evidence, semantic):
             reasons.append(f"instruction-like text inside evidence [{evidence_id}]")
     return (Decision.REVIEW if reasons else None), reasons
 
@@ -94,12 +118,13 @@ def check_policies(
     claim_checks: Sequence[ClaimCheck],
     summary_grounded: bool,
     config: PolicyConfig,
+    semantic: SemanticTripwire | None = None,
 ) -> PolicyResult:
-    floor, reasons = engine_floor(evidence, config)
+    floor, reasons = engine_floor(evidence, config, semantic)
     flags: list[PolicyFlag] = []
     unsupported = [c for c in claim_checks if c.status == "unsupported"]
 
-    for evidence_id in suspicious_evidence(evidence):
+    for evidence_id in suspicious_evidence(evidence, semantic):
         flags.append(
             PolicyFlag(
                 code="SUSPICIOUS_EVIDENCE_TEXT",

@@ -46,7 +46,7 @@ markers = [
 [tool.ruff]
 line-length = 100
 target-version = "py311"
-extend-exclude = ["frontend", ".venv", "backend/tests/knowledge_base/kb_helpers.py", "backend/tests/agents/agent_helpers.py"]
+extend-exclude = ["frontend", "notebooks", ".venv", "backend/tests/knowledge_base/kb_helpers.py", "backend/tests/agents/agent_helpers.py"]
 
 [[tool.mypy.overrides]]
 module = ["pandas.*", "sklearn.*", "sentence_transformers.*"]
@@ -58,6 +58,7 @@ select = ["E", "F", "I", "UP", "B", "SIM"]
 [tool.ruff.lint.per-file-ignores]
 "experiments/**" = ["E501"]  # report-rendering strings
 "backend/tests/**" = ["E501"]  # long literal payloads and URLs in tests
+"knowledge_base/ingestion/sanitize.py" = ["E501"]  # regular expressions read better unwrapped
 "scripts/build_results_report.py" = ["E501"]  # markdown table rows
 "llm/fine_tuning/*.py" = ["E501"]  # long template sentences are clearer unwrapped
 

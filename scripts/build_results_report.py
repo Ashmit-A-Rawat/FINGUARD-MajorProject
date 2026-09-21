@@ -151,13 +151,23 @@ def component_and_adversarial() -> list[str]:
         + ("(present)" if abl.exists() else "(PENDING)")
     )
     out.append(f"- Memo-injection sweep: `{adv}` " + ("(present)" if adv.exists() else "(PENDING)"))
+    t = load(REPORTS / "adversarial" / "tripwire_eval_final.json")
+    if t:
+        v4 = t["sets"]["v4"]["detectors"]
+        out.append(
+            "- Tripwire on the blind set v4: "
+            + "; ".join(
+                f"{n} recall {d['caught']}/{t['sets']['v4']['attacks']}, false positives {d['false_positives']}/{t['sets']['v4']['benign']}"
+                for n, d in v4.items()
+            )
+        )
     a = load(REPORTS / "adversarial" / "memo_injection_sweep.json")
     if a:
         c = a["classes"]
         lowered = sum(v["floor_lowered"] for v in c.values())
         out.append(
             f"- Across {len(c)} wording classes the floor of an engine-flagged problem case was lowered {lowered} times; "
-            f"the tripwire never caught {len(a['attack_wordings_never_caught'])} attack wordings."
+            f"the improved tripwire missed {len(a['attack_wordings_never_caught'])} of the v1 development wordings it was tuned on (see the blind-set line above for the honest estimate)."
         )
     return out
 

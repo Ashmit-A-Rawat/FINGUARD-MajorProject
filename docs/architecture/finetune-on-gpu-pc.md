@@ -1,4 +1,6 @@
-# Fine-tuning on a separate PC (step by step)
+# Fine-tuning on a separate machine (step by step)
+
+**Easiest option: a free cloud notebook.** Open [notebooks/train_lora_colab.ipynb](../../notebooks/train_lora_colab.ipynb) in Google Colab (File > Upload notebook, or open it from GitHub), choose Runtime > Change runtime type > GPU (a free T4 works, roughly 30-60 minutes), and run the cells top to bottom. It clones the repo, downloads the base model, trains, evaluates and gives you one zip to download. Kaggle notebooks work the same way (turn on GPU and Internet). The free session is deleted when it ends, so download the zip before closing it. The trainer automatically uses float32 on GPUs without bfloat16 (a T4). The manual steps for your own PC follow.
 
 The laptop (8 GB, Apple Silicon) cannot train: a single training sequence is ~2,000 tokens and MPS
 runs out of memory. Everything else is built and wired; only training needs a bigger machine.

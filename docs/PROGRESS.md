@@ -44,7 +44,9 @@ Updated at the end of every phase.
 
 ## Phases 13-14 in short
 - EXP-ABL-01 engine-floor ablation: reconciliation and anomaly engines cover different problem families; about a third of behavioural problems reach no engine flag (main residual risk).
-- EXP-ADV-01 memo-injection sweep: floor never lowered by any memo; the tripwire caught only 8 of 21 attack wordings (not tuned, documented).
+- EXP-ADV-01 memo-injection sweep: floor never lowered by any memo; the original tripwire caught only 8 of 21 attack wordings (improved in EXP-ADV-02).
+- EXP-ADV-02: tripwire improved. Regex normalisation + broader patterns, plus a semantic (embedding) classifier. On a blind set (v4) recall rose from 0.25 (regex) to 0.79 with 0/20 false positives; regex gains on the sets it was tuned on were mostly tuning (documented).
+- Colab/Kaggle notebook for the GPU step (`notebooks/train_lora_colab.ipynb`); the trainer picks float32 on GPUs without bf16 (T4). Not run on a GPU by the author.
 - EXP-LLM-02 (0.5B and 1.5B, 24 held-out cases): RAG did not measurably improve grounding (already at ceiling); the engine floor is the guardrail layer that helps; the unsupported-claim rule added nothing on this data; injection results inconclusive.
 - EXP-ORCH-01 (RQ5): multi-agent gave valid output more often (18/24 vs 13/24, inconclusive); latency direction flipped versus the earlier demo, so no latency claim.
 - RQ1/RQ2 re-run on two seeds each; `docs/research/results-summary.md` is generated from the reports.

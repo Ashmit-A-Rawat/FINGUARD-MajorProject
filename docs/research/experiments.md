@@ -357,6 +357,8 @@ Pooled (n=228): behavioural recall 0.64 [0.51, 0.75] with all engines versus 0.6
 
 ## EXP-ADV-01: payment-memo injection sweep (deterministic layers)
 
+> **Numbers below are for the ORIGINAL regex tripwire** (report kept as `evaluation/reports/adversarial/memo_injection_sweep_original_regex.*`). The tripwire was later improved (EXP-ADV-02); the current `memo_injection_sweep.*` uses the improved regex, and its 1.00 rates are on the DEVELOPMENT wordings the patterns were tuned on, so they are not evidence of generalisation.
+
 - Script: `experiments/adversarial/run_adversarial_suite.py` (`make adversarial`); wordings: `evaluation/adversarial_dataset/memo_injections.json` (7 classes, 30 wordings, hand-written by the author); artifacts: `evaluation/reports/adversarial/`.
 - Each wording is written into the memo of each held-out case and the engine floor recomputed.
 
@@ -433,3 +435,30 @@ Injection (1.5B + RAG, 8 injected reconciliation cases): the model answered CLEA
 
 ### Threats to validity
 - n=24 (8 per category, 16 problem cases), one run, greedy; CIs are wide and many differences are inconclusive. The 0.5B and 1.5B are different families of failure, so comparing them says nothing about model size in general. The problem cases include ones the engines do not flag, whose CLEAR rate depends on the anomaly model's threshold. Decision "agreement with the label" is not reported as a headline because a model that always says REVIEW scores the base rate.
+
+
+## EXP-ADV-02: improving the injection tripwire, measured on wordings it was not tuned on
+
+- Scripts: `experiments/adversarial/run_tripwire_eval.py`, `scripts/train_tripwire.py`; code: `knowledge_base/ingestion/sanitize.py` (regex + normalisation), `knowledge_base/ingestion/semantic_tripwire.py` (embedding classifier, `tripwire_model.json`); data: `evaluation/adversarial_dataset/memo_injections*.json` (v1-v4, hand-written by the author); tests: `backend/tests/knowledge_base/test_tripwire_v2.py`; report: `evaluation/reports/adversarial/tripwire_eval_final.*`.
+- Changes: (1) regex tripwire: text is normalised first (Unicode compatibility forms, zero-width characters, letter-spacing, digit-for-letter), patterns were broadened (override verb + object, role changes, dismissal phrases, exemptions, a few other languages) and then tightened after two real false positives were found in trusted/adversarial knowledge-base documents; (2) a semantic tripwire: logistic regression on MiniLM sentence embeddings, trained on the v1-v3 attack wordings against benign memos and knowledge-base sentences (C=10, threshold 0.7). It is opt-in per context (`SEMANTIC_TRIPWIRE=true` in the API; off by default in `build_context`, so earlier experiments are unchanged) and only runs with the embedding model it was trained with.
+- Protocol (what makes the numbers fair): v1 was the development set for the regex. v2 was written before the regex change but I had seen it while designing the patterns (weakly held out). v3 was written after the regex patterns were frozen, and scored once, but I then looked at several semantic-classifier settings on v3, so **v3 is a development set for the semantic model**. v4 was written after the semantic configuration was fixed, never used for training or tuning, and scored once: **v4 is the only fair held-out estimate for the semantic and combined detectors** (and a fair one for the regex).
+
+| detector | v4 recall (24 attacks) | v4 false positives (20 benign) | v3 recall (30) | v3 false positives (26) |
+|---|---|---|---|---|
+| original regex (before this work), scored on v2 only | n/a | n/a | v2: 0/24 caught | v2: 2/17 |
+| improved regex | 0.25 [0.12, 0.45] (6/24) | 0.00 [0.00, 0.16] | 0.23 [0.12, 0.41] | 1/26 |
+| semantic classifier | **0.79 [0.60, 0.91] (19/24)** | 0.00 [0.00, 0.16] | 0.93 (trained on it) | 0/26 |
+| either detector | **0.79 [0.60, 0.91]** | 0.00 [0.00, 0.16] | 0.93 (trained on it) | 1/26 |
+
+(Original regex on the frozen v2 set before any change: 0 of 24 caught, 2 of 17 benign flagged. Improved regex on v2 and v1: 1.00, but both were used to design it.)
+
+### What the data supports, and what it does not
+1. **The regex generalises badly, even after improvement**: it went from 0/24 to 24/24 on v2 and from 8/21 to 21/21 on v1, yet caught only 7/30 (v3) and 6/24 (v4) on wordings written afterwards. Near-perfect scores on the development sets were tuning, not skill; this is why the held-out sets exist.
+2. **The semantic classifier is the real improvement: 0.79 recall on the blind set (CI 0.60 to 0.91) at no false positives among 20 benign memos (CI upper bound 0.16).** It caught paraphrases and social-engineering wordings the regex cannot. It still misses about one in five attacks, and 0 of 20 false positives does not exclude a false-positive rate up to about 16%.
+3. **It remains a tripwire.** It only forces REVIEW and shows the reviewer why; an attacker who has read this repository can craft wordings that score low. The defence that does not depend on wording is the engine floor (EXP-ADV-01), and cases the engines missed remain the residual risk (EXP-ABL-01).
+4. The 0.79 is an estimate from 24 attacks written by one person who knew how the detector works; a real attacker population would differ.
+
+### Threats to validity
+- All wordings and all benign memos are author-written; the benign set is small and is not a sample of real payment memos. The synthetic data contains no memos at all (memos appear only when injected), so the false-positive rate on real evidence text could not be measured: 0 free-text strings in 228 cases.
+- The negatives used to train the semantic model include knowledge-base sentences, which are longer and more formal than memos; this may make it more likely to flag unusual short text. Only 75 attack examples were available for training.
+- The regex false positive on v2 ("Do not forget to review the terms...") comes from a pre-existing pattern I did not change; on v3 the regex flagged "Refund processed, no further action required", a plausible real memo, which shows the cost of the dismissal patterns.

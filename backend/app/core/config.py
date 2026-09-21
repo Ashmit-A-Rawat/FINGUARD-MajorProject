@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     llm_provider: str = "mock"  # mock | qwen | mistral
     llm_model: str = ""  # empty = the provider's default model
     llm_device: str = "auto"  # auto | cpu | mps | cuda
+    semantic_tripwire: bool = True  # second injection detector (needs the MiniLM embedder)
     llm_adapter: str = ""  # optional LoRA adapter directory (a fine-tuned model)
     llm_allow_download: bool = False  # never download model weights unless explicitly enabled
 

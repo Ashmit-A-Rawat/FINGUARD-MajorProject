@@ -2,7 +2,9 @@
 
 Design notes
 * Loss is computed on the ASSISTANT TOKENS ONLY (the JSON investigation); the long prompt is masked.
-* Base weights stay frozen in bfloat16; only LoRA adapters train (attention and MLP projections).
+* Base weights stay frozen; only LoRA adapters train (attention and MLP projections). They are loaded in
+  bfloat16, or in float32 on a CUDA GPU without bfloat16 support (for example a Colab T4), where 16-bit
+  training of the adapters would be unstable.
 * Gradient checkpointing keeps activation memory small enough for an 8 GB machine.
 * QLoRA (4-bit) is not used: bitsandbytes has no Apple-Silicon support. Plain LoRA is the honest
   equivalent here.
@@ -58,6 +60,12 @@ def encode(
     return prompt_ids + answer_ids, [-100] * len(prompt_ids) + answer_ids
 
 
+def pick_dtype(device: str) -> torch.dtype:
+    if device.startswith("cuda") and not torch.cuda.is_bf16_supported():
+        return torch.float32
+    return torch.bfloat16
+
+
 def _batch(pairs: list[tuple[list[int], list[int]]], device: str) -> dict[str, torch.Tensor]:
     ids, labels = pairs[0]  # micro-batch of one: no padding, no wasted compute
     return {
@@ -93,7 +101,8 @@ def train(cfg: TrainConfig) -> dict[str, Any]:
     lengths = [len(i) for i, _ in train_set]
     answer_tokens = [sum(1 for x in lab if x != -100) for _, lab in train_set]
 
-    base: Any = AutoModelForCausalLM.from_pretrained(cfg.base, dtype=torch.bfloat16)
+    dtype = pick_dtype(device)
+    base: Any = AutoModelForCausalLM.from_pretrained(cfg.base, dtype=dtype)
     model: Any = base.to(device)
     model.config.use_cache = False
     lora = LoraConfig(
@@ -130,6 +139,7 @@ def train(cfg: TrainConfig) -> dict[str, Any]:
     log: dict[str, Any] = {
         "config": {k: str(v) for k, v in asdict(cfg).items()},
         "device": device,
+        "dtype": str(dtype).replace("torch.", ""),
         "trainable_params": n_trainable,
         "train_examples": len(train_set),
         "val_examples": len(val_set),

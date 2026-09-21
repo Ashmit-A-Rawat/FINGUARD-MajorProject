@@ -59,7 +59,7 @@ class CaseWorkflow:
         self._reconciliation = ReconciliationAgent(ctx)
         self._investigator = InvestigationAgent(ctx)
         self._reviewer = reviewer or ReviewerAgent(
-            critique=SelfCritique()
+            critique=SelfCritique(semantic=ctx.semantic_tripwire)
         )  # guardrails on by default
         self._reporter = ReportAgent()
         S = CaseStatus

@@ -13,13 +13,17 @@ from backend.app.schemas.domain import Decision, Evidence
 from guardrails.evidence_validator import EvidenceIndex, check_claim, check_text_grounded
 from guardrails.models import ClaimCheck, CritiqueReport
 from guardrails.policy_checks import DECISION_RANK, PolicyConfig, check_policies
+from knowledge_base.ingestion.semantic_tripwire import SemanticTripwire
 from knowledge_base.models import RetrievedChunk
 from llm.schemas import InvestigationOutput
 
 
 class SelfCritique:
-    def __init__(self, config: PolicyConfig | None = None) -> None:
+    def __init__(
+        self, config: PolicyConfig | None = None, semantic: SemanticTripwire | None = None
+    ) -> None:
         self.config = config or PolicyConfig()
+        self.semantic = semantic
 
     def review(
         self,
@@ -51,7 +55,9 @@ class SelfCritique:
                     )
             grounded, grounded_reason = check_text_grounded(investigation.summary, index)
 
-        policy = check_policies(investigation, evidence, checks, grounded, self.config)
+        policy = check_policies(
+            investigation, evidence, checks, grounded, self.config, self.semantic
+        )
         model_decision = investigation.recommended_action if investigation else None
         candidates = [d for d in (model_decision, policy.floor) if d is not None]
         if any(c.status == "unsupported" for c in checks):

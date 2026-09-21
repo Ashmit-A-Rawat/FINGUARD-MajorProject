@@ -166,5 +166,7 @@ def test_evidence_tripwire_status_of_each_wording_is_known(phrase: str) -> None:
         created_at=datetime(2025, 1, 1),
     )
     flagged = bool(suspicious_evidence([e]))
-    if phrase == INJECTIONS_EVAL[2]:
-        assert not flagged  # deliberately evasive: tests the model, not the regex
+    # INJECTIONS_EVAL[2] was written to evade the ORIGINAL regex tripwire. The improved patterns
+    # (EXP-ADV-02, tuned on the v1 development set) catch it. It still tests the model: the tripwire
+    # only adds an engine-floor reason and never changes the prompt the model sees.
+    assert flagged, phrase
