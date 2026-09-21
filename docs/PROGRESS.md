@@ -1,6 +1,6 @@
 # FIN-GUARD: progress log
 
-Short record of what is built, what was measured, and what is still open. All data is synthetic.
+Full detail of everything: [MASTER.md](MASTER.md). Short record of what is built, what was measured, and what is still open. All data is synthetic.
 Detail lives in `docs/research/experiments.md` (results) and `docs/architecture/` (design).
 Updated at the end of every phase.
 

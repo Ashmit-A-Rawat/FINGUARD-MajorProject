@@ -6,7 +6,7 @@ An on-premise multi-agent AI system for automated KYC verification and financial
 
 ## Status
 
-All 14 phases are built. Short running summary: [docs/PROGRESS.md](docs/PROGRESS.md); every result with its threats to validity: [docs/research/experiments.md](docs/research/experiments.md); generated cross-experiment table: [docs/research/results-summary.md](docs/research/results-summary.md); how to reproduce: [docs/research/reproduce.md](docs/research/reproduce.md).
+All 14 phases are built. **Everything in one place (build log, issues and fixes, all tests and results, all training, what is left, how to run): [docs/MASTER.md](docs/MASTER.md).** Short running summary: [docs/PROGRESS.md](docs/PROGRESS.md); every result with its threats to validity: [docs/research/experiments.md](docs/research/experiments.md); generated cross-experiment table: [docs/research/results-summary.md](docs/research/results-summary.md); how to reproduce: [docs/research/reproduce.md](docs/research/reproduce.md).
 
 **One step is deliberately left to a GPU machine (a free Colab notebook works: [notebooks/train_lora_colab.ipynb](notebooks/train_lora_colab.ipynb)):** training the LoRA adapter (RQ6). Everything else, including the evaluation script for the fine-tuned arms, is in place: [docs/architecture/finetune-on-gpu-pc.md](docs/architecture/finetune-on-gpu-pc.md). Until then RQ6 is reported as PENDING, not estimated. Real local inference needs a deliberate model download (see docs/architecture/llm-architecture.md).
 
