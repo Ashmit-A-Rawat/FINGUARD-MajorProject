@@ -45,7 +45,7 @@ cp .env.example .env
 | Guardrail evaluation | `make guardrail-eval` |
 | Multi-agent demo | `make agents-demo` (needs the local model) |
 | Local LLM | `make hardware`; fetch weights deliberately (`scripts/fetch_weights.sh`); set `LLM_PROVIDER=qwen`, `LLM_MODEL=<dir or id>`; check with `make llm-check` |
-| Evaluation | *Phase 13* |
+| Everything in one place | [docs/MASTER.md](docs/MASTER.md): full build log, issues and fixes, all tests and results, all training, what is left, how to run |
 
 ## Research questions
 
