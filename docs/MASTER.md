@@ -109,7 +109,7 @@ Housekeeping done along the way (on request): removed unused packages and placeh
 ## 4. Every test and its result
 
 ### 4.1 Automated tests
-**Final state: 407 backend tests pass (about 23 s), 33 frontend tests pass, ruff clean, ruff format clean, mypy strict clean on 228 source files.** (Growth: 365 backend + 33 frontend at the end of phase 11; 380 after the phase-12 groundwork; 388 after phases 13-14; 407 now.)
+**Final state: 421 backend tests pass (about 23 s), 33 frontend tests pass, ruff clean, ruff format clean, mypy strict clean on 233 source files.** (Growth: 365 backend + 33 frontend at the end of phase 11; 380 after the phase-12 groundwork; 388 after phases 13-14; 407 after the tripwire work; 421 after adding the ESG governance module, Review-2 response.)
 
 Test functions per area (these counts include the newest files; parametrised cases raise the collected total to 407):
 
@@ -126,6 +126,7 @@ Test functions per area (these counts include the newest files; parametrised cas
 | agents | 30 | state order, fail-safe routing, invalid LLM output, four-eyes escalation, audit content; teacher targets have 0 unsupported claims and grounded summaries across 60 real cases, never ESCALATE, deterministic |
 | api | 31 | auth, throttling, role checks, personal-data visibility, audit chain integrity and tamper detection, no route name that freezes/blocks/reverses/contacts/files |
 | ablation | 5 | engine-floor configurations, evaluation metrics, injection never lowers a flag |
+| esg | 14 | governance scorer (cross-border/structuring), evidence shape, engine-floor wiring, on/off switch |
 | health | 2 | health endpoint |
 | frontend (vitest) | 33 | API client, decision rules (CLEAR against advisory needs acknowledgement), components |
 
@@ -273,7 +274,12 @@ Everything is built. Three things remain and all need something the laptop canno
 2. **Build and run the Docker images once** (`API_SECRET_KEY=$(openssl rand -base64 48) docker compose up --build`). The daemon was not running here, so only the compose file's syntax was validated; report any failure and it will be fixed.
 3. **Optional:** enable GitHub Actions so CI runs on the repository; produce a larger, independently written wording set and question set (small n and one-author bias are the main weaknesses of the evaluations).
 
-Known limitations that will remain: all data synthetic; small evaluation sets (24 cases); one seed for the LLM experiments; tripwires are heuristics; QLoRA is impossible on macOS (plain LoRA is used).
+From Review-2 feedback, also still open (see [architecture/esg-governance.md](architecture/esg-governance.md) for exactly what is and isn't built):
+4. **Wire the ESG governance indicator into the live multi-agent workflow.** It exists, is tested and reacts correctly through the engine policy floor, and was demonstrated on 17,023 real synthetic transactions, but `agents/coordinator/workflow.py` does not call it yet.
+5. **Environmental and Social scoring.** Not started: needs an external counterparty-sector and emissions/sustainability dataset this project does not have. Left as a documented extension point rather than invented.
+6. **True enterprise-scale validation of the neural anomaly models.** Tested up to 250,000 transactions; production bank volume (millions/day, distributed training) was not attempted.
+
+Known limitations that will remain: all data synthetic; small evaluation sets (24 cases); one seed for the LLM experiments; tripwires are heuristics; QLoRA is impossible on macOS (plain LoRA is used); ESG scoring covers only the Governance pillar.
 
 ---
 
@@ -293,7 +299,7 @@ export OMP_NUM_THREADS=1                              # macOS: required (the Mak
 ```bash
 make data            # small synthetic dataset, about 2 s (data/synthetic/small, git-ignored)
 make pipeline        # validated consolidation
-make test            # 407 backend tests
+make test            # 421 backend tests
 make lint typecheck  # ruff + mypy
 make frontend-test   # 33 frontend tests
 ```
@@ -356,6 +362,7 @@ Open `notebooks/train_lora_colab.ipynb` in Google Colab (Runtime > GPU) and run 
 | `knowledge_base/` | documents, ingestion (loader, sanitiser, semantic tripwire), chunking, retrieval, vector store |
 | `llm/` | providers, prompts, RAG glue, schemas, hardware, `fine_tuning/` (teacher, dataset, trainer) |
 | `agents/`, `guardrails/` | workflow, agents, audit; evidence validator, policy checks, self-critique |
+| `esg/` | governance-risk (ESG "G" pillar) evidence scorer, Review-2 response |
 | `evaluation/`, `experiments/` | metrics, ablations, golden and adversarial datasets, reports; one runner per experiment |
 | `frontend/` | React UI and tests, Dockerfile |
 | `scripts/` | data generation, pipeline, user creation, hardware, weights, dataset build, training, tripwire training, results report |

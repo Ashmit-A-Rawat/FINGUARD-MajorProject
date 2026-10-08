@@ -31,7 +31,7 @@ agents = ["langgraph>=0.2"]                                              # Phase
 [tool.setuptools.packages.find]
 include = [
   "backend*", "data_pipeline*", "kyc*", "anomaly_detection*", "reconciliation*",
-  "knowledge_base*", "llm*", "agents*", "guardrails*", "evaluation*",
+  "knowledge_base*", "llm*", "agents*", "guardrails*", "evaluation*", "esg*",
 ]
 
 [tool.pytest.ini_options]

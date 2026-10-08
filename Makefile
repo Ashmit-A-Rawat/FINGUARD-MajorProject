@@ -1,6 +1,6 @@
 PY := PYTHONPATH=. .venv/bin/python
 
-.PHONY: install test lint typecheck run data pipeline kyc-benchmark anomaly-benchmark reconciliation-eval rag-benchmark hardware llm-check agents-demo guardrail-eval finetune-data train-lora finetune-eval ablation adversarial results-report docker-up api frontend-dev frontend-test
+.PHONY: install test lint typecheck run data pipeline kyc-benchmark anomaly-benchmark reconciliation-eval rag-benchmark hardware llm-check agents-demo guardrail-eval finetune-data train-lora finetune-eval ablation adversarial esg-demo results-report docker-up api frontend-dev frontend-test
 install:
 	$(PY) -m pip install -e ".[dev]"
 test:
@@ -8,7 +8,7 @@ test:
 lint:
 	$(PY) -m ruff check .
 typecheck:
-	$(PY) -m mypy backend data_pipeline scripts kyc evaluation experiments anomaly_detection reconciliation knowledge_base llm guardrails agents
+	$(PY) -m mypy backend data_pipeline scripts kyc evaluation experiments anomaly_detection reconciliation knowledge_base llm guardrails agents esg
 pipeline:
 	$(PY) scripts/run_pipeline.py --preset small
 data:
@@ -48,6 +48,8 @@ ablation:
 	$(PY) experiments/ablation/run_component_ablation.py
 adversarial:
 	$(PY) experiments/adversarial/run_adversarial_suite.py
+esg-demo:
+	$(PY) experiments/esg/run_governance_demo.py
 results-report:
 	$(PY) scripts/build_results_report.py
 docker-up:

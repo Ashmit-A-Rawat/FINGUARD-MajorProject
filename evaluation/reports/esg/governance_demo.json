@@ -1,0 +1,225 @@
+{
+  "notice": "SYNTHETIC data. Descriptive demo of the governance scorer, not a validated benchmark (no ground-truth governance-risk labels exist in the generator).",
+  "config": {
+    "structuring_window_days": 30,
+    "structuring_threshold_amount": 10000.0,
+    "structuring_band_fraction": 0.9,
+    "structuring_min_count": 3
+  },
+  "transactions_checked": 17023,
+  "flagged": 1257,
+  "flagged_new_cross_border_counterparty": 1188,
+  "flagged_structuring_suspected": 77,
+  "examples": [
+    {
+      "customer_id": "CUST-000121",
+      "evidence_id": "ESG-TXN-00008289",
+      "description": "Governance indicators: first transaction with counterparty country IN",
+      "payload": {
+        "new_cross_border_counterparty": true,
+        "counterparty_country": "IN",
+        "structuring_suspected": false,
+        "structuring_window_days": 30,
+        "structuring_threshold_amount": 10000.0,
+        "sub_threshold_transactions_in_window": 0,
+        "flagged": true
+      }
+    },
+    {
+      "customer_id": "CUST-000220",
+      "evidence_id": "ESG-TXN-00003127",
+      "description": "Governance indicators: first transaction with counterparty country CA",
+      "payload": {
+        "new_cross_border_counterparty": true,
+        "counterparty_country": "CA",
+        "structuring_suspected": false,
+        "structuring_window_days": 30,
+        "structuring_threshold_amount": 10000.0,
+        "sub_threshold_transactions_in_window": 1,
+        "flagged": true
+      }
+    },
+    {
+      "customer_id": "CUST-000220",
+      "evidence_id": "ESG-TXN-00011980",
+      "description": "Governance indicators: first transaction with counterparty country SG",
+      "payload": {
+        "new_cross_border_counterparty": true,
+        "counterparty_country": "SG",
+        "structuring_suspected": false,
+        "structuring_window_days": 30,
+        "structuring_threshold_amount": 10000.0,
+        "sub_threshold_transactions_in_window": 0,
+        "flagged": true
+      }
+    },
+    {
+      "customer_id": "CUST-000808",
+      "evidence_id": "ESG-TXN-00002172",
+      "description": "Governance indicators: first transaction with counterparty country GB",
+      "payload": {
+        "new_cross_border_counterparty": true,
+        "counterparty_country": "GB",
+        "structuring_suspected": false,
+        "structuring_window_days": 30,
+        "structuring_threshold_amount": 10000.0,
+        "sub_threshold_transactions_in_window": 0,
+        "flagged": true
+      }
+    },
+    {
+      "customer_id": "CUST-000808",
+      "evidence_id": "ESG-TXN-00003244",
+      "description": "Governance indicators: first transaction with counterparty country AU",
+      "payload": {
+        "new_cross_border_counterparty": true,
+        "counterparty_country": "AU",
+        "structuring_suspected": false,
+        "structuring_window_days": 30,
+        "structuring_threshold_amount": 10000.0,
+        "sub_threshold_transactions_in_window": 0,
+        "flagged": true
+      }
+    },
+    {
+      "customer_id": "CUST-000808",
+      "evidence_id": "ESG-TXN-00003737",
+      "description": "Governance indicators: first transaction with counterparty country FR",
+      "payload": {
+        "new_cross_border_counterparty": true,
+        "counterparty_country": "FR",
+        "structuring_suspected": false,
+        "structuring_window_days": 30,
+        "structuring_threshold_amount": 10000.0,
+        "sub_threshold_transactions_in_window": 0,
+        "flagged": true
+      }
+    },
+    {
+      "customer_id": "CUST-000808",
+      "evidence_id": "ESG-TXN-00004144",
+      "description": "Governance indicators: first transaction with counterparty country IN",
+      "payload": {
+        "new_cross_border_counterparty": true,
+        "counterparty_country": "IN",
+        "structuring_suspected": false,
+        "structuring_window_days": 30,
+        "structuring_threshold_amount": 10000.0,
+        "sub_threshold_transactions_in_window": 0,
+        "flagged": true
+      }
+    },
+    {
+      "customer_id": "CUST-000808",
+      "evidence_id": "ESG-TXN-00008248",
+      "description": "Governance indicators: first transaction with counterparty country AE",
+      "payload": {
+        "new_cross_border_counterparty": true,
+        "counterparty_country": "AE",
+        "structuring_suspected": false,
+        "structuring_window_days": 30,
+        "structuring_threshold_amount": 10000.0,
+        "sub_threshold_transactions_in_window": 0,
+        "flagged": true
+      }
+    },
+    {
+      "customer_id": "CUST-000808",
+      "evidence_id": "ESG-TXN-00008651",
+      "description": "Governance indicators: first transaction with counterparty country SG",
+      "payload": {
+        "new_cross_border_counterparty": true,
+        "counterparty_country": "SG",
+        "structuring_suspected": false,
+        "structuring_window_days": 30,
+        "structuring_threshold_amount": 10000.0,
+        "sub_threshold_transactions_in_window": 0,
+        "flagged": true
+      }
+    },
+    {
+      "customer_id": "CUST-000808",
+      "evidence_id": "ESG-TXN-00010284",
+      "description": "Governance indicators: first transaction with counterparty country CA",
+      "payload": {
+        "new_cross_border_counterparty": true,
+        "counterparty_country": "CA",
+        "structuring_suspected": false,
+        "structuring_window_days": 30,
+        "structuring_threshold_amount": 10000.0,
+        "sub_threshold_transactions_in_window": 0,
+        "flagged": true
+      }
+    },
+    {
+      "customer_id": "CUST-000808",
+      "evidence_id": "ESG-TXN-00013649",
+      "description": "Governance indicators: first transaction with counterparty country TR",
+      "payload": {
+        "new_cross_border_counterparty": true,
+        "counterparty_country": "TR",
+        "structuring_suspected": false,
+        "structuring_window_days": 30,
+        "structuring_threshold_amount": 10000.0,
+        "sub_threshold_transactions_in_window": 0,
+        "flagged": true
+      }
+    },
+    {
+      "customer_id": "CUST-000672",
+      "evidence_id": "ESG-TXN-00006320",
+      "description": "Governance indicators: first transaction with counterparty country AU",
+      "payload": {
+        "new_cross_border_counterparty": true,
+        "counterparty_country": "AU",
+        "structuring_suspected": false,
+        "structuring_window_days": 30,
+        "structuring_threshold_amount": 10000.0,
+        "sub_threshold_transactions_in_window": 0,
+        "flagged": true
+      }
+    },
+    {
+      "customer_id": "CUST-000672",
+      "evidence_id": "ESG-TXN-00009689",
+      "description": "Governance indicators: first transaction with counterparty country GB",
+      "payload": {
+        "new_cross_border_counterparty": true,
+        "counterparty_country": "GB",
+        "structuring_suspected": false,
+        "structuring_window_days": 30,
+        "structuring_threshold_amount": 10000.0,
+        "sub_threshold_transactions_in_window": 0,
+        "flagged": true
+      }
+    },
+    {
+      "customer_id": "CUST-000672",
+      "evidence_id": "ESG-TXN-00014571",
+      "description": "Governance indicators: first transaction with counterparty country AE",
+      "payload": {
+        "new_cross_border_counterparty": true,
+        "counterparty_country": "AE",
+        "structuring_suspected": false,
+        "structuring_window_days": 30,
+        "structuring_threshold_amount": 10000.0,
+        "sub_threshold_transactions_in_window": 0,
+        "flagged": true
+      }
+    },
+    {
+      "customer_id": "CUST-000672",
+      "evidence_id": "ESG-TXN-00015771",
+      "description": "Governance indicators: first transaction with counterparty country FR",
+      "payload": {
+        "new_cross_border_counterparty": true,
+        "counterparty_country": "FR",
+        "structuring_suspected": false,
+        "structuring_window_days": 30,
+        "structuring_threshold_amount": 10000.0,
+        "sub_threshold_transactions_in_window": 0,
+        "flagged": true
+      }
+    }
+  ]
+}

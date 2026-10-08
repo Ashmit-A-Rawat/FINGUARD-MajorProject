@@ -32,6 +32,7 @@ class PolicyConfig(BaseModel):
     status_rules_force_review: bool = False
     anomaly_flag_forces_review: bool = True
     kyc_concerns_force_review: bool = True
+    esg_governance_forces_review: bool = True
     suspicious_evidence_forces_review: bool = True
     confidence_ceiling_with_unsupported: float = 0.5
 
@@ -106,6 +107,11 @@ def engine_floor(
                 )
             if any(str(c).startswith("dob_") for c in payload.get("own_contradictions", [])):
                 reasons.append(f"KYC: date-of-birth conflict [{e.evidence_id}]")
+        elif e.evidence_id.startswith("ESG-") and config.esg_governance_forces_review:
+            if payload.get("new_cross_border_counterparty"):
+                reasons.append(f"governance: new cross-border counterparty [{e.evidence_id}]")
+            if payload.get("structuring_suspected"):
+                reasons.append(f"governance: possible structuring pattern [{e.evidence_id}]")
     if config.suspicious_evidence_forces_review:
         for evidence_id in suspicious_evidence(evidence, semantic):
             reasons.append(f"instruction-like text inside evidence [{evidence_id}]")

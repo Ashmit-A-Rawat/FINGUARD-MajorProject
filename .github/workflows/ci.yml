@@ -10,7 +10,7 @@ jobs:
       - run: pip install torch --index-url https://download.pytorch.org/whl/cpu
       - run: pip install -e ".[dev,api,data,ml,kyc,rag,llm]"
       - run: ruff check . && ruff format --check .
-      - run: mypy backend data_pipeline scripts kyc evaluation experiments anomaly_detection reconciliation knowledge_base llm guardrails agents
+      - run: mypy backend data_pipeline scripts kyc evaluation experiments anomaly_detection reconciliation knowledge_base llm guardrails agents esg
       - run: pytest -q
         env: { OMP_NUM_THREADS: "1" }
   frontend:

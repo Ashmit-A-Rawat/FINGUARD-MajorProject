@@ -52,6 +52,12 @@ Updated at the end of every phase.
 - RQ1/RQ2 re-run on two seeds each; `docs/research/results-summary.md` is generated from the reports.
 - Deployment: Dockerfile, frontend Dockerfile + nginx (CSP), compose (Postgres, API, web), CI workflow, reproduction guide, CITATION.cff.
 
+## Response to Review-2 feedback
+- Terminology: the module is named and documented as "transaction anomaly detection" (not AML/trade fraud) and KYC is kept as a separate, named problem; the workflow is explicitly described as three parts (post-transaction reconciliation, consolidation, knowledge base), matching the reviewer's own wording.
+- Supervised vs unsupervised: already directly answered by EXP-ANOM-01 (9 models across both paradigms, with reasoning for why supervised/neural fits this use case).
+- ESG scoring: not fully built (needs real sector/emissions data this project does not have). Added a working, tested proof of concept instead: `esg/governance_scoring.py` computes a Governance-pillar indicator (new cross-border counterparty, possible structuring) from real transaction history, wired into the engine policy floor (`ESG_` evidence, `PolicyConfig.esg_governance_forces_review`), with 14 tests and a live demo on real synthetic data (17,023 transactions checked, 1,257 flagged). Not yet called by the live multi-agent workflow. Details: [esg-governance.md](architecture/esg-governance.md).
+- Enterprise-scale neural network: not done overnight (needs production-scale data and compute); documented honestly as research-scale (up to 250,000 transactions tested) with a stated path to scale, not claimed as solved.
+
 ## Corrections made along the way
 - EXP-AGENTS-01 latency explanation retracted after it was found wrong.
 - "2 of 4 injected pairs" sentence in EXP-GUARD-01 corrected.

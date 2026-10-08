@@ -84,6 +84,7 @@ class EvidenceSource(StrEnum):
     RECONCILIATION = "reconciliation"
     KNOWLEDGE_BASE = "knowledge_base"
     TRANSACTION = "transaction"
+    ESG = "esg"  # governance-risk indicator; see esg/governance_scoring.py
 
 
 class Severity(StrEnum):
