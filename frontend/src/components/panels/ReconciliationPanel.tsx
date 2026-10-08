@@ -8,7 +8,7 @@ export function ReconciliationPanel({ results, focusIds }: { results: Reconcilia
   const context = results.filter((r) => !focusIds.includes(r.transaction_id));
   const contextIssues = context.filter((r) => r.status === "discrepancy").length;
   return (
-    <Card id="reconciliation" title="Reconciliation results">
+    <Card id="reconciliation" title="Reconciliation results" icon="scale">
       {focus.length === 0 ? (
         <Empty>No reconciliation results yet.</Empty>
       ) : (

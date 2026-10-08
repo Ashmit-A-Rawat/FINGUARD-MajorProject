@@ -3,7 +3,7 @@ import { Badge, Banner, Card, Empty } from "../ui";
 
 export function AnomalyPanel({ findings }: { findings: AnomalyFinding[] }) {
   return (
-    <Card id="anomaly" title="Anomaly analysis">
+    <Card id="anomaly" title="Anomaly analysis" icon="chart">
       {findings.length === 0 ? (
         <Empty>No anomaly analysis yet.</Empty>
       ) : (

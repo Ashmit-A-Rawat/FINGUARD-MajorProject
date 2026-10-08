@@ -10,9 +10,20 @@ import { EvidencePanel } from "./panels/EvidencePanel";
 import { InvestigationPanel } from "./panels/InvestigationPanel";
 import { ReconciliationPanel } from "./panels/ReconciliationPanel";
 import { TimelinePanel } from "./panels/TimelinePanel";
-import { Badge, Banner, DecisionBadge, Empty } from "./ui";
+import { Badge, Banner, DecisionBadge, Empty, Icon } from "./ui";
+import type { IconName } from "./ui";
 
-const NAV = [["customer", "Customer"], ["timeline", "Timeline"], ["anomaly", "Anomaly"], ["reconciliation", "Reconciliation"], ["evidence", "Evidence"], ["investigation", "AI investigation"], ["critique", "Self-critique"], ["decision", "Decision"], ["audit", "Audit trail"]];
+const NAV: [string, string, IconName][] = [
+  ["customer", "Customer", "user"],
+  ["timeline", "Timeline", "clock"],
+  ["anomaly", "Anomaly", "chart"],
+  ["reconciliation", "Reconciliation", "scale"],
+  ["evidence", "Evidence", "book"],
+  ["investigation", "AI investigation", "bot"],
+  ["critique", "Self-critique", "check-shield"],
+  ["decision", "Decision", "gavel"],
+  ["audit", "Audit trail", "history"],
+];
 
 export function CaseView({ caseId, api, session, onChanged }: { caseId: string; api: Api; session: Session; onChanged: () => void }) {
   const [detail, setDetail] = useState<CaseDetail | null>(null);
@@ -53,25 +64,29 @@ export function CaseView({ caseId, api, session, onChanged }: { caseId: string; 
 
   return (
     <div className="space-y-4">
-      <header className="sticky top-0 z-10 -mx-4 border-b border-slate-200 bg-slate-50/95 px-4 py-2 backdrop-blur">
+      <header className="sticky top-0 z-10 -mx-4 border-b border-slate-200 bg-slate-50/95 px-4 py-2.5 backdrop-blur">
         <div className="flex flex-wrap items-center gap-2">
-          <h1 className="text-lg font-semibold">{s.case_id}</h1>
+          <h1 className="font-mono text-lg font-semibold text-slate-800">{s.case_id}</h1>
           <Badge>{s.status.replace("_", " ")}</Badge>
           <DecisionBadge decision={s.advisory_decision} label="advisory" />
           {s.proposed_decision && s.proposed_decision !== s.advisory_decision && <DecisionBadge decision={s.proposed_decision} label="model said" />}
           {s.is_mock && <Badge tone="red">MOCK</Badge>}
           {s.validated === false && <Badge tone="amber">not validated</Badge>}
         </div>
-        <nav aria-label="Sections" className="mt-1 flex flex-wrap gap-x-3 text-xs">
-          {NAV.map(([id, label]) => <a key={id} href={`#${id}`} className="text-sky-800 underline decoration-dotted">{label}</a>)}
+        <nav aria-label="Sections" className="mt-1.5 flex flex-wrap gap-x-1 gap-y-1 text-xs">
+          {NAV.map(([id, label, icon]) => (
+            <a key={id} href={`#${id}`} className="flex items-center gap-1 rounded-md px-1.5 py-1 text-slate-600 transition-colors hover:bg-brand-50 hover:text-brand-700">
+              <Icon name={icon} className="h-3.5 w-3.5" />{label}
+            </a>
+          ))}
         </nav>
       </header>
 
       {running && <Banner tone="blue">The analysis is running ({s.job_state}). This page updates automatically.</Banner>}
       {s.job_state === "failed" && <Banner tone="red">The analysis job failed: {s.job_error}</Banner>}
       {warnings.length > 0 && (
-        <details open className="rounded border border-amber-300 bg-amber-50 p-2 text-sm text-amber-900">
-          <summary className="cursor-pointer font-medium">{warnings.length} warning(s) to read before deciding</summary>
+        <details open className="rounded-lg border border-amber-300 bg-amber-50 p-2 text-sm text-amber-900">
+          <summary className="flex cursor-pointer items-center gap-1.5 font-medium"><Icon name="alert" className="h-4 w-4" />{warnings.length} warning(s) to read before deciding</summary>
           <ul className="mt-1 list-disc pl-5">{warnings.map((w) => <li key={w}>{w}</li>)}</ul>
         </details>
       )}

@@ -6,7 +6,7 @@ export function CustomerPanel({ detail }: { detail: CaseDetail }) {
   const details = c.details;
   const today = detail.timeline.length ? detail.timeline[detail.timeline.length - 1].timestamp.slice(0, 10) : "";
   return (
-    <Card id="customer" title="Customer & KYC">
+    <Card id="customer" title="Customer & KYC" icon="user">
       {!c.customer_id ? (
         <Empty>Customer data is not available yet.</Empty>
       ) : (

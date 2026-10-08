@@ -21,7 +21,7 @@ export function AuditPanel({ caseId, api }: { caseId: string; api: Api }) {
   }
 
   return (
-    <Card id="audit" title="Audit trail" aside={data && <Badge tone={data.chain.ok ? "green" : "red"}>{data.chain.ok ? `chain intact (${data.chain.events} events)` : "CHAIN BROKEN"}</Badge>}>
+    <Card id="audit" title="Audit trail" icon="history" aside={data && <Badge tone={data.chain.ok ? "green" : "red"}>{data.chain.ok ? `chain intact (${data.chain.events} events)` : "CHAIN BROKEN"}</Badge>}>
       <div className="space-y-2 text-sm">
         <p className="text-xs text-slate-500">Append-only and hash-chained: altering, deleting or reordering an event breaks every later hash. Opening the trail is itself recorded.</p>
         <button type="button" onClick={load} disabled={loading} className="rounded border border-slate-400 px-3 py-1 disabled:opacity-40">{data ? "Reload" : "Load audit trail"}</button>

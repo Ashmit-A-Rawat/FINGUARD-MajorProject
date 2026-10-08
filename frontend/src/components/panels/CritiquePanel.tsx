@@ -4,7 +4,7 @@ import { Badge, Banner, Card, DecisionBadge, Empty, SupportBadge } from "../ui";
 export function CritiquePanel({ detail }: { detail: CaseDetail }) {
   const c = detail.review?.critique ?? null;
   return (
-    <Card id="critique" title="Self-critique (automated evidence checks)" aside={detail.report && <Badge tone={detail.report.validated ? "green" : "amber"}>{detail.report.validated ? "passed checks" : "not validated"}</Badge>}>
+    <Card id="critique" title="Self-critique (automated evidence checks)" icon="check-shield" aside={detail.report && <Badge tone={detail.report.validated ? "green" : "amber"}>{detail.report.validated ? "passed checks" : "not validated"}</Badge>}>
       {!c ? (
         <Empty>{detail.review ? "No guardrails ran for this case." : "Not reviewed yet."}</Empty>
       ) : (
