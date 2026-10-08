@@ -3,7 +3,7 @@ import { Badge, Card, Empty, Json } from "../ui";
 
 export function EvidencePanel({ detail, highlight }: { detail: CaseDetail; highlight: string | null }) {
   return (
-    <Card id="evidence" title="Retrieved evidence" icon="book" aside={<span className="text-xs text-slate-500">{detail.evidence.length} case items · {detail.knowledge_chunks.length} reference passages</span>}>
+    <Card id="evidence" title="Retrieved evidence" aside={<span className="text-xs text-slate-500">{detail.evidence.length} case items · {detail.knowledge_chunks.length} reference passages</span>}>
       {detail.evidence.length === 0 ? (
         <Empty>No evidence yet.</Empty>
       ) : (

@@ -32,7 +32,7 @@ export function DecisionPanel({ detail, session, api, onUpdated }: { detail: Cas
 
   const so = detail.sign_off;
   return (
-    <Card id="decision" title="Decision" icon="gavel" aside={<div className="flex gap-1"><DecisionBadge decision={detail.report?.proposed_decision ?? null} label="model" /><DecisionBadge decision={detail.report?.advisory_decision ?? null} label="advisory" /></div>}>
+    <Card id="decision" title="Decision" aside={<div className="flex gap-1"><DecisionBadge decision={detail.report?.proposed_decision ?? null} label="model" /><DecisionBadge decision={detail.report?.advisory_decision ?? null} label="advisory" /></div>}>
       <div className="space-y-3 text-sm">
         <p className="text-xs text-slate-500">The system is advisory. It never freezes an account, blocks a card, contacts a customer or files a report. Your decision is recorded under your name.</p>
         {so && (

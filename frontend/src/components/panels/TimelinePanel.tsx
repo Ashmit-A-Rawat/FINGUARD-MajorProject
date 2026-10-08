@@ -19,7 +19,7 @@ function AmountStrip({ items }: { items: TimelineItem[] }) {
 
 export function TimelinePanel({ items }: { items: TimelineItem[] }) {
   return (
-    <Card id="timeline" title="Transaction timeline" icon="clock" aside={<span className="text-xs text-slate-500">focus in red, reconciliation findings in amber</span>}>
+    <Card id="timeline" title="Transaction timeline" aside={<span className="text-xs text-slate-500">focus in red, reconciliation findings in amber</span>}>
       {items.length === 0 ? (
         <Empty>No transactions to show yet.</Empty>
       ) : (

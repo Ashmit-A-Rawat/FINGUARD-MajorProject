@@ -7,7 +7,7 @@ export function InvestigationPanel({ detail, onCite }: { detail: CaseDetail; onC
   const findings = detail.report?.model_findings ?? [];
   const cite = (raw: string) => raw.replace(/^[EK]:/, "");
   return (
-    <Card id="investigation" title="AI investigation" icon="bot" aside={inv && <DecisionBadge decision={inv.recommended_action} label="model proposes" />}>
+    <Card id="investigation" title="AI investigation" aside={inv && <DecisionBadge decision={inv.recommended_action} label="model proposes" />}>
       <div className="space-y-3 text-sm">
         <Banner tone="amber">
           Advisory text written by a small language model. It can be wrong, and it can be manipulated by text inside the case. Rely on the engine facts and the verdicts below; a human decides.
